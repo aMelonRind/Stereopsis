@@ -1,0 +1,24 @@
+{
+  "targets": [
+    "back",
+    "left",
+    "right"
+  ],
+  "passes": [
+    {
+      "name": "stereopsis",
+      "intarget": "back",
+      "outtarget": "minecraft:main",
+      "auxtargets": [
+        {
+          "name": "LeftSampler",
+          "id": "left"
+        },
+        {
+          "name": "RightSampler",
+          "id": "right"
+        }
+      ]
+    }
+  ]
+}

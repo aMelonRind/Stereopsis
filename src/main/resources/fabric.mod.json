@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "stereopsis",
+  "version": "${version}",
+  "name": "Stereopsis",
+  "description": "A mod that can render stereopsis, spatial illusion without VR glasses/headset.",
+  "authors": [
+    "MelonRind"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/stereopsis",
+    "sources": "https://github.com/aMelonRind/Stereopsis",
+    "issues": "https://github.com/aMelonRind/Stereopsis/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/stereopsis/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "io.github.amelonrind.stereopsis.Stereopsis"
+    ]
+  },
+  "mixins": [
+    "stereopsis.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${supported_minecraft_version}"
+  }
+}

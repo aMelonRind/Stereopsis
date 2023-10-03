@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.amelonrind.stereopsis.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "MixinCamera",
+    "MixinGameRenderer",
+    "MixinInGameHud",
+    "MixinMinecraftClient",
+    "MixinPostEffectProcessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
