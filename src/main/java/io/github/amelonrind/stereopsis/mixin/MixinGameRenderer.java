@@ -29,7 +29,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
-    @Unique private static final MinecraftClient mc = MinecraftClient.getInstance();
     @Unique private static final double PI2 = Math.PI / 2;
     @Unique private static final double D2R = Math.PI / 180;
     @Unique private static final double eyeRadius = 0.1;
@@ -47,12 +46,14 @@ public abstract class MixinGameRenderer {
 
     @Shadow @Final private Camera camera;
 
+    @Shadow @Final MinecraftClient client;
+
     @Inject(at = @At("TAIL"), method = "loadPrograms")
     public void loadPrograms(ResourceFactory factory, CallbackInfo ci) {
         clear();
         try {
-            post = new PostEffectProcessor(mc.getTextureManager(), mc.getResourceManager(), mc.getFramebuffer(), postId);
-            post.setupDimensions(mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
+            post = new PostEffectProcessor(client.getTextureManager(), client.getResourceManager(), client.getFramebuffer(), postId);
+            post.setupDimensions(client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight());
             back = post.getSecondaryTarget("back");
             left = post.getSecondaryTarget("left");
             right = post.getSecondaryTarget("right");
@@ -61,7 +62,7 @@ public abstract class MixinGameRenderer {
         } catch (Exception e) {
             Stereopsis.LOGGER.warn("Failed to load post processor", e);
             clear();
-            Stereopsis.LOGGER.info(mc.getResourceManager().findResources("stereopsis:", id -> true).toString());
+            Stereopsis.LOGGER.info(client.getResourceManager().findResources("stereopsis:", id -> true).toString());
         }
     }
 
@@ -86,33 +87,33 @@ public abstract class MixinGameRenderer {
         if (Stereopsis.enabled && !rendering && loaded) {
             rendering = true;
             ci.cancel();
-            mc.getProfiler().push("stereopsis");
+            client.getProfiler().push("stereopsis");
 
-            mc.getProfiler().push("blit");
+            client.getProfiler().push("blit");
             back.clear(MinecraftClient.IS_SYSTEM_MAC);
             left.clear(MinecraftClient.IS_SYSTEM_MAC);
             right.clear(MinecraftClient.IS_SYSTEM_MAC);
-            blit(mc.getFramebuffer(), back);
+            blit(client.getFramebuffer(), back);
             blit(back, left);
             blit(back, right);
 
-            mc.getProfiler().swap("left");
+            client.getProfiler().swap("left");
             Stereopsis.framebufferOverride = left;
             left.beginWrite(true);
             righting = false;
             renderWorld(tickDelta, limitTime, new MatrixStack());
 
-            mc.getProfiler().swap("right");
+            client.getProfiler().swap("right");
             Stereopsis.framebufferOverride = right;
             right.beginWrite(true);
             righting = true;
             renderWorld(tickDelta, limitTime, new MatrixStack());
 
             Stereopsis.framebufferOverride = null;
-            mc.getProfiler().swap("render");
+            client.getProfiler().swap("render");
             double xOffset = 0.0;
             if (yawOffset > 0.0) {
-                xOffset = yawOffset / Math.atan(Math.tan(mc.options.getFov().getValue() * D2R / 2.0) * ((double) mc.getWindow().getFramebufferWidth() / mc.getWindow().getFramebufferHeight())) / 2;
+                xOffset = yawOffset / Math.atan(Math.tan(client.options.getFov().getValue() * D2R / 2.0) * ((double) client.getWindow().getFramebufferWidth() / client.getWindow().getFramebufferHeight())) / 2;
                 if (xOffset > 0.25) xOffset = 0.25;
             }
             float finalXOffset = (float) xOffset;
@@ -121,11 +122,11 @@ public abstract class MixinGameRenderer {
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
             post.render(tickDelta);
-            mc.getFramebuffer().beginWrite(false);
+            client.getFramebuffer().beginWrite(false);
             RenderSystem.enableCull();
 
-            mc.getProfiler().pop();
-            mc.getProfiler().pop();
+            client.getProfiler().pop();
+            client.getProfiler().pop();
             rendering = false;
         }
     }
@@ -136,12 +137,12 @@ public abstract class MixinGameRenderer {
             ((MixinCamera) camera).callMoveBy(0, 0, righting ? -eyeRadius : eyeRadius);
             if (righting) {
                 double to = 0.0;
-                if (mc.world != null && (mc.cameraEntity != null || mc.player != null)) {
-                    Entity cam = mc.cameraEntity != null ? mc.cameraEntity : mc.player;
+                if (client.world != null && (client.cameraEntity != null || client.player != null)) {
+                    Entity cam = client.cameraEntity != null ? client.cameraEntity : client.player;
                     Vec3d start = cam.getCameraPosVec(tickDelta);
                     Vec3d rot = cam.getRotationVec(tickDelta);
                     Vec3d end = start.add(rot.multiply(16.0));
-                    HitResult res = mc.world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.ANY, cam));
+                    HitResult res = client.world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.ANY, cam));
                     double dist = res.getPos().distanceTo(start);
                     if (dist > 0.15) {
                         if (dist > 0.5) {
