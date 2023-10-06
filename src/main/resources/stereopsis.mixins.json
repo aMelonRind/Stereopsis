@@ -7,10 +7,14 @@
   ],
   "client": [
     "MixinCamera",
+    "MixinChatHud",
+    "MixinFishingBobberEntityRenderer",
     "MixinGameRenderer",
+    "MixinHeldItemRenderer",
     "MixinInGameHud",
     "MixinMinecraftClient",
-    "MixinPostEffectProcessor"
+    "MixinPostEffectProcessor",
+    "MixinSpectatorHud"
   ],
   "injectors": {
     "defaultRequire": 1
