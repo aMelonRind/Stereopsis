@@ -6,7 +6,8 @@
   "mixins": [
   ],
   "client": [
-    "MixinCamera",
+    "MixinAccessCamera",
+    "MixinAccessPostEffectProcessor",
     "MixinChatHud",
     "MixinFishingBobberEntityRenderer",
     "MixinGameRenderer",

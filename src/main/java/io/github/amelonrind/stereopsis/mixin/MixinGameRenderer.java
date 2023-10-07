@@ -130,13 +130,17 @@ public abstract class MixinGameRenderer {
             left.beginWrite(true);
             righting = false;
             renderWorld(tickDelta, limitTime, matrices);
+            client.worldRenderer.drawEntityOutlinesFramebuffer();
 
             client.getProfiler().swap("right");
             Stereopsis.framebufferOverride = right;
             right.beginWrite(true);
             righting = true;
             renderWorld(tickDelta, limitTime, new MatrixStack());
+            client.worldRenderer.drawEntityOutlinesFramebuffer();
 
+            Framebuffer outlines = client.worldRenderer.getEntityOutlinesFramebuffer();
+            if (outlines != null) outlines.clear(MinecraftClient.IS_SYSTEM_MAC);
             Stereopsis.framebufferOverride = null;
             client.getProfiler().swap("render");
             xOffset = 0.0f;
@@ -144,7 +148,7 @@ public abstract class MixinGameRenderer {
                 xOffset = (float) (yawOffset / Math.atan(Math.tan(client.options.getFov().getValue() * D2R / 2.0) * screenAspectRatio) / 2);
                 if (xOffset > 0.25f) xOffset = 0.25f;
             }
-            ((MixinPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(xOffset));
+            ((MixinAccessPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(xOffset));
             RenderSystem.disableCull();
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
@@ -161,7 +165,7 @@ public abstract class MixinGameRenderer {
     @Inject(at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/BlockView;Lnet/minecraft/entity/Entity;ZZF)V"), method = "renderWorld")
     public void shiftCamera(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         if (enabled) {
-            ((MixinCamera) camera).callMoveBy(0, 0, righting ? -eyeRadius : eyeRadius);
+            ((MixinAccessCamera) camera).callMoveBy(0, 0, righting ? -eyeRadius : eyeRadius);
             if (!righting) {
                 double to = 0.0;
                 if (client.world != null && (client.cameraEntity != null || client.player != null)) {

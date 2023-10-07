@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(Camera.class)
-public interface MixinCamera {
+public interface MixinAccessCamera {
 
     @Invoker void callMoveBy(double x, double y, double z);
 
