@@ -24,7 +24,8 @@
     "stereopsis.mixins.json"
   ],
   "depends": {
+    "minecraft": "${supported_minecraft_version}",
     "fabricloader": ">=${loader_version}",
-    "minecraft": "${supported_minecraft_version}"
+    "fabric-api": "*"
   }
 }
