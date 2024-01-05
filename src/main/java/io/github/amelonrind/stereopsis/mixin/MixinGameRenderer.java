@@ -2,6 +2,7 @@ package io.github.amelonrind.stereopsis.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.amelonrind.stereopsis.config.Config;
 import io.github.amelonrind.stereopsis.Stereopsis;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
@@ -35,14 +36,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-import static io.github.amelonrind.stereopsis.Stereopsis.enabled;
-import static io.github.amelonrind.stereopsis.Stereopsis.loaded;
-import static io.github.amelonrind.stereopsis.Stereopsis.rendering;
-import static io.github.amelonrind.stereopsis.Stereopsis.righting;
-import static io.github.amelonrind.stereopsis.Stereopsis.xOffset;
-import static io.github.amelonrind.stereopsis.Stereopsis.leftCrosshair;
-import static io.github.amelonrind.stereopsis.Stereopsis.rightCrosshair;
-import static io.github.amelonrind.stereopsis.Stereopsis.screenAspectRatio;
+import static io.github.amelonrind.stereopsis.Stereopsis.*;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
@@ -60,11 +54,11 @@ public abstract class MixinGameRenderer {
     @Unique private static final double eyeRadius = 0.1;
     @Unique private static final Identifier postId = new Identifier("stereopsis:shaders/post/stereopsis.json");
     @Unique private static PostEffectProcessor post = null;
+    @Unique private static boolean flip = false;
     @Unique private static Framebuffer back = null;
     @Unique private static Framebuffer left = null;
     @Unique private static Framebuffer right = null;
-    @Unique private static long lastFrameNanoTime = System.nanoTime();
-    @Unique private static double yawOffset = 0.0f;
+    @Unique private static long lastFrameTime = System.nanoTime();
 
     @Unique private static Vec3d crosshair = null;
     @Unique private static Vec3d leftCrosshairPos = new Vec3d(0, 0, 0);
@@ -84,6 +78,8 @@ public abstract class MixinGameRenderer {
             loaded = true;
             Stereopsis.LOGGER.info("Loaded post processor");
         } catch (Exception e) {
+            loaded = false;
+            enabled = false;
             Stereopsis.LOGGER.warn("Failed to load post processor", e);
             clear();
         }
@@ -112,6 +108,14 @@ public abstract class MixinGameRenderer {
         if (enabled && !rendering) {
             rendering = true;
             ci.cancel();
+
+            if (Config.HANDLER.instance().flipView != flip) {
+                Framebuffer temp = left;
+                left = right;
+                right = temp;
+                flip = !flip;
+            }
+
             client.getProfiler().push("stereopsis-world");
             crosshair = null;
             leftCrosshair = null;
@@ -143,11 +147,12 @@ public abstract class MixinGameRenderer {
             if (outlines != null) outlines.clear(MinecraftClient.IS_SYSTEM_MAC);
             Stereopsis.framebufferOverride = null;
             client.getProfiler().swap("render");
-            xOffset = 0.0f;
-            if (yawOffset > 0.0) {
-                xOffset = (float) (yawOffset / Math.atan(Math.tan(client.options.getFov().getValue() * D2R / 2.0) * screenAspectRatio) / 2);
-                if (xOffset > 0.25f) xOffset = 0.25f;
-            }
+//            if (yawOffset > 0.0) {
+//                xOffset = Math.min(
+//                        (float) (yawOffset / Math.atan(Math.tan(client.options.getFov().getValue() * D2R / 2.0) * screenAspectRatio) / 2),
+//                        Config.HANDLER.instance().maxXOffset
+//                );
+//            }
             ((MixinAccessPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(xOffset));
             RenderSystem.disableCull();
             RenderSystem.disableBlend();
@@ -195,7 +200,10 @@ public abstract class MixinGameRenderer {
                         }
                         if (dist < 0.5) dist = 0.5;
                         if (res.getType() != HitResult.Type.MISS) {
-                            to = PI2 - Math.atan2(dist, eyeRadius);
+                            to = Math.min(
+                                    ((PI2 - Math.atan2(dist, eyeRadius)) / Math.atan(Math.tan(client.options.getFov().getValue() * D2R / 2.0) * screenAspectRatio) / 2),
+                                    Config.HANDLER.instance().maxXOffset
+                            );
                         }
                     }
                     if (client.crosshairTarget == null || client.crosshairTarget.getType() == HitResult.Type.MISS) {
@@ -204,19 +212,23 @@ public abstract class MixinGameRenderer {
                         crosshair = client.crosshairTarget.getPos();
                     }
                 }
-                if (yawOffset == to) lastFrameNanoTime = 0;
+                float multiplier = Config.HANDLER.instance().offsetSpeed;
+                if (multiplier < 0) xOffset = (float) to;
+                else if (multiplier == 0) xOffset = 0;
+                else if (xOffset == to) lastFrameTime = 0;
                 else {
-                    if (Math.abs(yawOffset - to) < Float.MIN_VALUE) {
-                        yawOffset = to;
-                        lastFrameNanoTime = 0;
+                    if (Math.abs(xOffset - to) < Float.MIN_VALUE) {
+                        xOffset = (float) to;
+                        lastFrameTime = 0;
                     } else {
-                        if (lastFrameNanoTime == 0) lastFrameNanoTime = System.currentTimeMillis();
+                        if (lastFrameTime == 0) lastFrameTime = System.currentTimeMillis();
                         else {
-                            long elapsed = -(lastFrameNanoTime - (lastFrameNanoTime = System.currentTimeMillis()));
+                            long elapsed = -(lastFrameTime - (lastFrameTime = System.currentTimeMillis()));
                             if (elapsed > 0) {
                                 double fps = 1E3 / Math.max(1, Math.min(elapsed, 10E3));
-                                if (fps <= 2) yawOffset = to;
-                                else yawOffset += (to - yawOffset) / (fps / 2);
+                                double mul = multiplier / (fps / 2);
+                                if (mul >= 1) xOffset = (float) to;
+                                else xOffset += (float) ((to - xOffset) * mul);
                             }
                         }
                     }

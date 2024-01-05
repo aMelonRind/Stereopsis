@@ -11,11 +11,11 @@
       "outtarget": "minecraft:main",
       "auxtargets": [
         {
-          "name": "LeftSampler",
+          "name": "LeftViewSampler",
           "id": "left"
         },
         {
-          "name": "RightSampler",
+          "name": "RightViewSampler",
           "id": "right"
         }
       ]

@@ -1,6 +1,7 @@
 package io.github.amelonrind.stereopsis.mixin;
 
 import io.github.amelonrind.stereopsis.Stereopsis;
+import io.github.amelonrind.stereopsis.config.Config;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -74,6 +75,7 @@ public abstract class MixinInGameHud {
             client.getProfiler().push("stereopsis-crosshair");
             rendering = true;
             offset = scaledWidth * (0.25f - xOffset);
+            if (Config.HANDLER.instance().flipView) offset = -offset;
 
             righting = false;
             renderCrosshair(context);

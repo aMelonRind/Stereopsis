@@ -18,6 +18,9 @@
   "entrypoints": {
     "client": [
       "io.github.amelonrind.stereopsis.Stereopsis"
+    ],
+    "modmenu": [
+      "io.github.amelonrind.stereopsis.config.ModMenuApiImpl"
     ]
   },
   "mixins": [
@@ -26,6 +29,7 @@
   "depends": {
     "minecraft": "${supported_minecraft_version}",
     "fabricloader": ">=${loader_version}",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "yet_another_config_lib_v3": "*"
   }
 }
