@@ -260,7 +260,7 @@ public abstract class MixinGameRenderer {
         }
     }
 
-    @ModifyArg(method = "renderWorld", index = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;loadProjectionMatrix(Lorg/joml/Matrix4f;)V"))
+    @ModifyArg(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;loadProjectionMatrix(Lorg/joml/Matrix4f;)V"))
     public Matrix4f loadProjectionMatrix(Matrix4f projectionMatrix) {
         if (rendering && !client.options.hudHidden) {
             (righting ? rightMatrix : leftMatrix).identity().mul(projectionMatrix);
