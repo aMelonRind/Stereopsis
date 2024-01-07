@@ -19,7 +19,7 @@ public class Config {
     @SerialEntry(comment = "Set to true to auto enable stereopsis on game launch")
     public boolean enableOnLaunch = false;
 
-    @SerialEntry(comment = "Set to true for parallel mode (AR mode)")
+    @SerialEntry(comment = "Experimental! Set to true for parallel mode (AR mode)")
     public boolean flipView = false;
 
     @SerialEntry(comment = "The max offset for the view to focus on the crosshair. This value shouldn't be higher than 0.25")
