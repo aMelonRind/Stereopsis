@@ -38,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import static io.github.amelonrind.stereopsis.Stereopsis.*;
 
-@Mixin(GameRenderer.class)
+@Mixin(value = GameRenderer.class, priority = 950)
 public abstract class MixinGameRenderer {
 
     @Shadow @Final MinecraftClient client;
@@ -75,6 +75,7 @@ public abstract class MixinGameRenderer {
             back = post.getSecondaryTarget("back");
             left = post.getSecondaryTarget("left");
             right = post.getSecondaryTarget("right");
+            flip = false;
             loaded = true;
             Stereopsis.LOGGER.info("Loaded post processor");
         } catch (Exception e) {
