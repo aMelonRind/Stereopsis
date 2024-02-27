@@ -280,12 +280,14 @@ public abstract class MixinGameRenderer {
         }
     }
 
+    @Unique
+    private boolean fItemSide = false;
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(IIF)V"))
     public void splitFloatingItem(Args args) {
         if (enabled) {
-            righting = false;
+            fItemSide = false;
             renderFloatingItem(args.get(0), args.get(1), args.get(2));
-            righting = true;
+            fItemSide = true;
         }
     }
 
@@ -293,7 +295,7 @@ public abstract class MixinGameRenderer {
     public float moveFloatingItem(float x) {
         if (enabled) {
             float off = Stereopsis.getHudOffset(null);
-            x += righting ? -off : off;
+            x += fItemSide ? -off : off;
         }
         return x;
     }
