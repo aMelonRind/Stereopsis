@@ -73,9 +73,9 @@ public class Stereopsis implements ClientModInitializer {
         hudOffset = -1.0f;
     }
 
-    public static float getHudOffset(@Nullable DrawContext context) {
+    public static float getHudOffset() {
         if (hudOffset == -1.0f) {
-            int width = context == null ? mc.getWindow().getScaledWidth() : context.getScaledWindowWidth();
+            int width = mc.getWindow().getScaledWidth();
             hudOffset = width / 4.0f + (Config.get().flipView ? xOffset : -xOffset) * width + 120 / screenAspectRatio;
             if (hudOffset < HUD_HALF_WIDTH) hudOffset = HUD_HALF_WIDTH;
             int max = width / 2 - HUD_HALF_WIDTH;
@@ -107,7 +107,7 @@ public class Stereopsis implements ClientModInitializer {
         if (enabled) {
             mc.getProfiler().push("stereopsis-" + name);
             context.getMatrices().push();
-            context.getMatrices().translate((toRight ? 2 : -2) * Stereopsis.getHudOffset(context), 0, 0);
+            context.getMatrices().translate((toRight ? 2 : -2) * Stereopsis.getHudOffset(), 0, 0);
             render.run();
             context.getMatrices().pop();
             mc.getProfiler().pop();
@@ -116,7 +116,7 @@ public class Stereopsis implements ClientModInitializer {
 
     public static void offsetHudPush(@NotNull DrawContext context, boolean righting) {
         context.getMatrices().push();
-        float off = getHudOffset(context);
+        float off = getHudOffset();
         context.getMatrices().translate(righting ? -off : off, 0, 0);
     }
 

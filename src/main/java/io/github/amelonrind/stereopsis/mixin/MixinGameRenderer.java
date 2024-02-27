@@ -287,7 +287,7 @@ public abstract class MixinGameRenderer {
     @ModifyArg(method = "renderFloatingItem", index = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
     public float moveFloatingItem(float x) {
         if (enabled) {
-            float off = Stereopsis.getHudOffset(null);
+            float off = Stereopsis.getHudOffset();
             x += fItemSide ? -off : off;
         }
         return x;
