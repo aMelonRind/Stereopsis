@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.github.amelonrind.stereopsis.mixin",
+  "plugin": "io.github.amelonrind.stereopsis.mixin.ConfigPluginImpl",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
@@ -15,7 +16,9 @@
     "MixinInGameHud",
     "MixinMinecraftClient",
     "MixinPostEffectProcessor",
-    "MixinSpectatorHud"
+    "MixinSpectatorHud",
+    "devgpupatch.MixinGameRenderer",
+    "devgpupatch.MixinVertexBuffer"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -25,6 +25,7 @@ public class Stereopsis implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final int HUD_HALF_WIDTH = 125;
 
+    public static boolean devGpuPatch = false;
     public static boolean enabled = false;
     public static boolean loaded = false;
     public static boolean rendering = false;
