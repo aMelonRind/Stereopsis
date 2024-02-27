@@ -16,6 +16,10 @@ public class Config {
                     .build())
             .build();
 
+    public static Config get() {
+        return HANDLER.instance();
+    }
+
     @SerialEntry(comment = "Set to true to auto enable stereopsis on game launch")
     public boolean enableOnLaunch = false;
 

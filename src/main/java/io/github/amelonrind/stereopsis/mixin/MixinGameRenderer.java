@@ -110,7 +110,7 @@ public abstract class MixinGameRenderer {
             rendering = true;
             ci.cancel();
 
-            if (Config.HANDLER.instance().flipView != flip) {
+            if (Config.get().flipView != flip) {
                 Framebuffer temp = left;
                 left = right;
                 right = temp;
@@ -203,7 +203,7 @@ public abstract class MixinGameRenderer {
                         if (res.getType() != HitResult.Type.MISS) {
                             to = Math.min(
                                     ((PI2 - Math.atan2(dist, eyeRadius)) / Math.atan(Math.tan(client.options.getFov().getValue() * D2R / 2.0) * screenAspectRatio) / 2),
-                                    Config.HANDLER.instance().maxXOffset
+                                    Config.get().maxXOffset
                             );
                         }
                     }
@@ -213,7 +213,7 @@ public abstract class MixinGameRenderer {
                         crosshair = client.crosshairTarget.getPos();
                     }
                 }
-                float multiplier = Config.HANDLER.instance().offsetSpeed;
+                float multiplier = Config.get().offsetSpeed;
                 if (multiplier < 0) xOffset = (float) to;
                 else if (multiplier == 0) xOffset = 0;
                 else if (xOffset == to) lastFrameTime = 0;

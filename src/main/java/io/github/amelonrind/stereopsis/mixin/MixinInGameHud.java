@@ -75,7 +75,7 @@ public abstract class MixinInGameHud {
             client.getProfiler().push("stereopsis-crosshair");
             rendering = true;
             offset = scaledWidth * (0.25f - xOffset);
-            if (Config.HANDLER.instance().flipView) offset = -offset;
+            if (Config.get().flipView) offset = -offset;
 
             righting = false;
             renderCrosshair(context);

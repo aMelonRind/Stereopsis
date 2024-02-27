@@ -1,4 +1,17 @@
 {
   "key.stereopsis.toggle": "Toggle",
-  "key.stereopsis.category": "Stereopsis"
+  "key.stereopsis.category": "Stereopsis",
+
+  "stereopsis.settings.title": "Stereopsis Config",
+  "stereopsis.settings.flipView": "View Mode",
+  "stereopsis.settings.flipView.description": "Switch between cross mode or parallel mode (Experimental).",
+  "stereopsis.settings.enableOnLaunch": "Enable On Launch",
+  "stereopsis.settings.enableOnLaunch.description": "If enabled, stereopsis will enable automatically on game launch.",
+  "stereopsis.settings.maxXOffset": "Max Horizontal Offset",
+  "stereopsis.settings.maxXOffset.description": "The max offset for the view to focus on the crosshair.",
+  "stereopsis.settings.offsetSpeed": "Horizontal Offset Speed",
+  "stereopsis.settings.value.ar": "AR (Parallel) (Experimental)",
+  "stereopsis.settings.value.cross": "Cross",
+  "stereopsis.settings.value.instant": "Instant",
+  "stereopsis.settings.value.disabled": "Disabled"
 }

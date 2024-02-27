@@ -5,14 +5,17 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
+//import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
+//import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -41,11 +44,16 @@ public class Stereopsis implements ClientModInitializer {
 
     private static float hudOffset = -1.0f;
 
+    @Contract(value = "_ -> new", pure = true)
+    public static @NotNull MutableText translatable(String key) {
+        return Text.translatable(MOD_ID + "." + key);
+    }
+
     @Override
     public void onInitializeClient() {
         Config.HANDLER.load();
-        Config.HANDLER.instance().fixValues();
-        if (Config.HANDLER.instance().enableOnLaunch) enabled = true;
+        Config.get().fixValues();
+        if (Config.get().enableOnLaunch) enabled = true;
         KeyBinding key = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.stereopsis.toggle",
                 InputUtil.Type.KEYSYM,
@@ -68,7 +76,7 @@ public class Stereopsis implements ClientModInitializer {
     public static float getHudOffset(@Nullable DrawContext context) {
         if (hudOffset == -1.0f) {
             int width = context == null ? mc.getWindow().getScaledWidth() : context.getScaledWindowWidth();
-            hudOffset = width / 4.0f + (Config.HANDLER.instance().flipView ? xOffset : -xOffset) * width + 120 / screenAspectRatio;
+            hudOffset = width / 4.0f + (Config.get().flipView ? xOffset : -xOffset) * width + 120 / screenAspectRatio;
             if (hudOffset < HUD_HALF_WIDTH) hudOffset = HUD_HALF_WIDTH;
             int max = width / 2 - HUD_HALF_WIDTH;
             if (hudOffset > max) hudOffset = max;
