@@ -68,7 +68,7 @@ public abstract class MixinInGameHud {
     @Unique private static boolean wasPushed = false;
     @Unique private static float offset = 0.0f;
 
-    @Inject(at = @At("HEAD"), method = "renderCrosshair", cancellable = true)
+    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     public void moveCrosshair(DrawContext context, CallbackInfo ci) {
         if (enabled && !rendering) {
             ci.cancel();
@@ -98,7 +98,7 @@ public abstract class MixinInGameHud {
         return x;
     }
 
-    @Inject(at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;)V"), method = "renderCrosshair")
+    @Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;)V"))
     public void moveNormalCrosshair(DrawContext context, CallbackInfo ci) {
         if (rendering) {
             float off = (righting ? -offset : offset);
@@ -110,7 +110,7 @@ public abstract class MixinInGameHud {
         }
     }
 
-    @Inject(at = @At("TAIL"), method = "renderCrosshair")
+    @Inject(method = "renderCrosshair", at = @At("TAIL"))
     public void moveNormalCrosshairPop(DrawContext context, CallbackInfo ci) {
         if (wasPushed) {
             context.getMatrices().pop();
@@ -118,32 +118,32 @@ public abstract class MixinInGameHud {
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "renderHotbar", cancellable = true)
+    @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void moveHotbar(float tickDelta, DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("hotbar", context, ci, () -> renderHotbar(tickDelta, context));
     }
 
-    @Inject(at = @At("HEAD"), method = "renderStatusBars", cancellable = true)
+    @Inject(method = "renderStatusBars", at = @At("HEAD"), cancellable = true)
     public void moveStatusBars(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("status-bar", context, ci, () -> renderStatusBars(context));
     }
 
-    @Inject(at = @At("HEAD"), method = "renderMountHealth", cancellable = true)
+    @Inject(method = "renderMountHealth", at = @At("HEAD"), cancellable = true)
     public void moveMountHealth(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("mount-health", context, ci, () -> renderMountHealth(context));
     }
 
-    @Inject(at = @At("HEAD"), method = "renderMountJumpBar", cancellable = true)
+    @Inject(method = "renderMountJumpBar", at = @At("HEAD"), cancellable = true)
     public void moveMountJumpBar(JumpingMount mount, DrawContext context, int x, CallbackInfo ci) {
         Stereopsis.moveHud("mount-jump-bar", context, ci, () -> renderMountJumpBar(mount, context, x));
     }
 
-    @Inject(at = @At("HEAD"), method = "renderExperienceBar", cancellable = true)
+    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
     public void moveExperienceBar(DrawContext context, int x, CallbackInfo ci) {
         Stereopsis.moveHud("experience-bar", context, ci, () -> renderExperienceBar(context, x));
     }
 
-    @Inject(at = @At("HEAD"), method = "renderHeldItemTooltip", cancellable = true)
+    @Inject(method = "renderHeldItemTooltip", at = @At("HEAD"), cancellable = true)
     public void moveHeldItemTooltip(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("held-item-tooltip", context, ci, () -> renderHeldItemTooltip(context));
     }
@@ -173,17 +173,17 @@ public abstract class MixinInGameHud {
         return context;
     }
 
-    @Inject(at = @At("HEAD"), method = "renderVignetteOverlay", cancellable = true)
+    @Inject(method = "renderVignetteOverlay", at = @At("HEAD"), cancellable = true)
     public void cancelVignetteOverlay(DrawContext context, Entity entity, CallbackInfo ci) {
         if (enabled) ci.cancel();
     }
 
-    @Inject(at = @At("HEAD"), method = "renderSpyglassOverlay", cancellable = true)
+    @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
     public void cancelSpyglassOverlay(DrawContext context, float scale, CallbackInfo ci) {
         if (enabled) ci.cancel();
     }
 
-    @Inject(at = @At("HEAD"), method = "renderOverlay", cancellable = true)
+    @Inject(method = "renderOverlay", at = @At("HEAD"), cancellable = true)
     public void cancelOverlay(DrawContext context, Identifier texture, float opacity, CallbackInfo ci) {
         if (enabled) ci.cancel();
     }

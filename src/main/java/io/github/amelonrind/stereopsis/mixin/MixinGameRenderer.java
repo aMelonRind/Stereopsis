@@ -66,7 +66,7 @@ public abstract class MixinGameRenderer {
     @Unique private static final Matrix4f leftMatrix = new Matrix4f();
     @Unique private static final Matrix4f rightMatrix = new Matrix4f();
 
-    @Inject(at = @At("TAIL"), method = "loadPrograms")
+    @Inject(method = "loadPrograms", at = @At("TAIL"))
     public void loadPrograms(ResourceFactory factory, CallbackInfo ci) {
         clear();
         try {
@@ -86,7 +86,7 @@ public abstract class MixinGameRenderer {
         }
     }
 
-    @Inject(at = @At("TAIL"), method = "clearPrograms")
+    @Inject(method = "clearPrograms", at = @At("TAIL"))
     public void clearPrograms(CallbackInfo ci) {
         clear();
     }
@@ -102,7 +102,7 @@ public abstract class MixinGameRenderer {
         left = right = null;
     }
 
-    @Inject(at = @At("HEAD"), method = "renderWorld", cancellable = true)
+    @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
     public void renderStereopsis(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         screenAspectRatio = (float) client.getWindow().getFramebufferWidth() / client.getWindow().getFramebufferHeight();
         Stereopsis.resetHudOffset();
@@ -168,7 +168,7 @@ public abstract class MixinGameRenderer {
         }
     }
 
-    @Inject(at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/BlockView;Lnet/minecraft/entity/Entity;ZZF)V"), method = "renderWorld")
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/BlockView;Lnet/minecraft/entity/Entity;ZZF)V"))
     public void shiftCamera(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         if (enabled) {
             ((MixinAccessCamera) camera).callMoveBy(0, 0, righting ? -eyeRadius : eyeRadius);
@@ -242,7 +242,7 @@ public abstract class MixinGameRenderer {
         }
     }
 
-    @Inject(at = @At("TAIL"), method = "onResized")
+    @Inject(method = "onResized", at = @At("TAIL"))
     public void onResized(int width, int height, CallbackInfo ci) {
         if (loaded) post.setupDimensions(width, height);
     }
@@ -280,8 +280,7 @@ public abstract class MixinGameRenderer {
         }
     }
 
-    @Unique
-    private boolean fItemSide = false;
+    @Unique private boolean fItemSide = false;
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(IIF)V"))
     public void splitFloatingItem(Args args) {
         if (enabled) {

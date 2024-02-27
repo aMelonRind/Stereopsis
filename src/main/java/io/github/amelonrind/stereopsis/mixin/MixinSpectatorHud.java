@@ -16,12 +16,12 @@ public abstract class MixinSpectatorHud {
 
     @Shadow public abstract void render(DrawContext context);
 
-    @Inject(at = @At("HEAD"), method = "renderSpectatorMenu(Lnet/minecraft/client/gui/DrawContext;)V", cancellable = true)
+    @Inject(method = "renderSpectatorMenu(Lnet/minecraft/client/gui/DrawContext;)V", at = @At("HEAD"), cancellable = true)
     public void moveSpectatorMenu(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("spectator-menu", context, ci, () -> renderSpectatorMenu(context));
     }
 
-    @Inject(at = @At("HEAD"), method = "render", cancellable = true)
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void move(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("spectator", context, ci, () -> render(context));
     }
