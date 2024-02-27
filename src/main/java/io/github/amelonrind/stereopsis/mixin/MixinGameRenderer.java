@@ -148,12 +148,6 @@ public abstract class MixinGameRenderer {
             if (outlines != null) outlines.clear(MinecraftClient.IS_SYSTEM_MAC);
             Stereopsis.framebufferOverride = null;
             client.getProfiler().swap("render");
-//            if (yawOffset > 0.0) {
-//                xOffset = Math.min(
-//                        (float) (yawOffset / Math.atan(Math.tan(client.options.getFov().getValue() * D2R / 2.0) * screenAspectRatio) / 2),
-//                        Config.HANDLER.instance().maxXOffset
-//                );
-//            }
             ((MixinAccessPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(xOffset));
             RenderSystem.disableCull();
             RenderSystem.disableBlend();
