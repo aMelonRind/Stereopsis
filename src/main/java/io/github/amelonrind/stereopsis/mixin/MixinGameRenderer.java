@@ -147,7 +147,7 @@ public abstract class MixinGameRenderer {
             Stereopsis.framebufferOverride = null;
             client.getProfiler().swap("render");
             if (doMagic) blit(cache, left); // this fixes shader glitches and idk why
-            ((MixinAccessPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(xOffset));
+            ((MixinAccessPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(flip ? -xOffset : xOffset));
             RenderSystem.disableCull();
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
@@ -282,7 +282,7 @@ public abstract class MixinGameRenderer {
             // could be better, but I can't  -aMelonRind
             // seems like only the x is correct, y is jumping at a large range which is obviously wrong
             Vector4f vec = transform(righting ? rightCrosshairPos : leftCrosshairPos, matrices, righting ? rightMatrix : leftMatrix);
-            if (righting) rightCrosshair = vec;
+            if (righting ^ flip) rightCrosshair = vec;
             else leftCrosshair = vec;
         }
     }
