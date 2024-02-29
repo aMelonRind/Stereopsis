@@ -8,7 +8,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
 public class Config {
-    public static ConfigClassHandler<Config> HANDLER = ConfigClassHandler.createBuilder(Config.class)
+    public static final ConfigClassHandler<Config> HANDLER = ConfigClassHandler.createBuilder(Config.class)
             .id(new Identifier(Stereopsis.MOD_ID, "main"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve(Stereopsis.MOD_ID + ".json5"))
@@ -20,11 +20,14 @@ public class Config {
         return HANDLER.instance();
     }
 
+    @SerialEntry(comment = "Experimental! Set to true for parallel mode (AR mode)")
+    public boolean flipView = false;
+
     @SerialEntry(comment = "Set to true to auto enable stereopsis on game launch")
     public boolean enableOnLaunch = false;
 
-    @SerialEntry(comment = "Experimental! Set to true for parallel mode (AR mode)")
-    public boolean flipView = false;
+    @SerialEntry(comment = "This takes around 0.8% of performance (no other mod, new world, no shaders). If you're using shader pack, you probably want this to be on. It will (hopefully) fix shader rendering problem. I (dev) have no idea how this works, so it's a magic fix.")
+    public boolean magicFixForShaders = false;
 
     @SerialEntry(comment = "The max offset for the view to focus on the crosshair. This value shouldn't be higher than 0.25")
     public float maxXOffset = 0.25f;
