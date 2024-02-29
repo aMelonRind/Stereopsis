@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinMinecraftClient {
 
     @Inject(method = "getFramebuffer", at = @At("HEAD"), cancellable = true)
-    public void overrideFramebuffer(CallbackInfoReturnable<Framebuffer> cir) {
+    private void overrideFramebuffer(CallbackInfoReturnable<Framebuffer> cir) {
         if (Stereopsis.framebufferOverride != null) cir.setReturnValue(Stereopsis.framebufferOverride);
     }
 

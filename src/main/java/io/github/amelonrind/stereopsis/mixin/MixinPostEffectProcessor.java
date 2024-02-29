@@ -16,7 +16,7 @@ public class MixinPostEffectProcessor {
     @Shadow @Final private String name;
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void blockSpiderPostShader(float tickDelta, CallbackInfo ci) {
+    private void blockSpiderPostShader(float tickDelta, CallbackInfo ci) {
         if (enabled && name.equals("minecraft:shaders/post/spider.json")) ci.cancel();
     }
 

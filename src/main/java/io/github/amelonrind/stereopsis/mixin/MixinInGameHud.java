@@ -69,7 +69,7 @@ public abstract class MixinInGameHud {
     @Unique private static float offset = 0.0f;
 
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    public void moveCrosshair(DrawContext context, CallbackInfo ci) {
+    private void moveCrosshair(DrawContext context, CallbackInfo ci) {
         if (enabled && !rendering) {
             ci.cancel();
             client.getProfiler().push("stereopsis-crosshair");
@@ -89,7 +89,7 @@ public abstract class MixinInGameHud {
     }
 
     @ModifyArg(method = "renderCrosshair", index = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
-    public float move3DCrosshair(float x) {
+    private float move3DCrosshair(float x) {
         if (rendering) {
             x += (righting ? -offset : offset);
             Vector4f crosshair = righting ? rightCrosshair : leftCrosshair;
@@ -99,7 +99,7 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;)V"))
-    public void moveNormalCrosshair(DrawContext context, CallbackInfo ci) {
+    private void moveNormalCrosshair(DrawContext context, CallbackInfo ci) {
         if (rendering) {
             float off = (righting ? -offset : offset);
             Vector4f crosshair = righting ? rightCrosshair : leftCrosshair;
@@ -111,7 +111,7 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(method = "renderCrosshair", at = @At("TAIL"))
-    public void moveNormalCrosshairPop(DrawContext context, CallbackInfo ci) {
+    private void moveNormalCrosshairPop(DrawContext context, CallbackInfo ci) {
         if (wasPushed) {
             context.getMatrices().pop();
             wasPushed = false;
@@ -119,72 +119,72 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    public void moveHotbar(float tickDelta, DrawContext context, CallbackInfo ci) {
+    private void moveHotbar(float tickDelta, DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("hotbar", context, ci, () -> renderHotbar(tickDelta, context));
     }
 
     @Inject(method = "renderStatusBars", at = @At("HEAD"), cancellable = true)
-    public void moveStatusBars(DrawContext context, CallbackInfo ci) {
+    private void moveStatusBars(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("status-bar", context, ci, () -> renderStatusBars(context));
     }
 
     @Inject(method = "renderMountHealth", at = @At("HEAD"), cancellable = true)
-    public void moveMountHealth(DrawContext context, CallbackInfo ci) {
+    private void moveMountHealth(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("mount-health", context, ci, () -> renderMountHealth(context));
     }
 
     @Inject(method = "renderMountJumpBar", at = @At("HEAD"), cancellable = true)
-    public void moveMountJumpBar(JumpingMount mount, DrawContext context, int x, CallbackInfo ci) {
+    private void moveMountJumpBar(JumpingMount mount, DrawContext context, int x, CallbackInfo ci) {
         Stereopsis.moveHud("mount-jump-bar", context, ci, () -> renderMountJumpBar(mount, context, x));
     }
 
     @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
-    public void moveExperienceBar(DrawContext context, int x, CallbackInfo ci) {
+    private void moveExperienceBar(DrawContext context, int x, CallbackInfo ci) {
         Stereopsis.moveHud("experience-bar", context, ci, () -> renderExperienceBar(context, x));
     }
 
     @Inject(method = "renderHeldItemTooltip", at = @At("HEAD"), cancellable = true)
-    public void moveHeldItemTooltip(DrawContext context, CallbackInfo ci) {
+    private void moveHeldItemTooltip(DrawContext context, CallbackInfo ci) {
         Stereopsis.moveHud("held-item-tooltip", context, ci, () -> renderHeldItemTooltip(context));
     }
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;render(Lnet/minecraft/client/gui/DrawContext;III)V"))
-    public void moveChatHud(Args args) {
+    private void moveChatHud(Args args) {
         if (!enabled || client.options.getChatVisibility().getValue() == ChatVisibility.HIDDEN || (client.currentScreen instanceof ChatScreen)) return;
         DrawContext context = args.get(0);
         Stereopsis.moveSideHud("chat-hud", context, true, () -> chatHud.render(context, args.get(1), args.get(2), args.get(3)));
     }
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V"))
-    public void moveScoreboard(Args args) {
+    private void moveScoreboard(Args args) {
         DrawContext context = args.get(0);
         Stereopsis.moveSideHud("scoreboard", context, false, () -> renderScoreboardSidebar(context, args.get(1)));
     }
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SubtitlesHud;render(Lnet/minecraft/client/gui/DrawContext;)V"))
-    public DrawContext moveSubtitle(DrawContext context) {
+    private DrawContext moveSubtitle(DrawContext context) {
         Stereopsis.moveSideHud("subtitle", context, false, () -> subtitlesHud.render(context));
         return context;
     }
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/gui/DrawContext;)V"))
-    public DrawContext moveStatusEffects(DrawContext context) {
+    private DrawContext moveStatusEffects(DrawContext context) {
         Stereopsis.moveSideHud("status-effects", context, false, () -> renderStatusEffectOverlay(context));
         return context;
     }
 
     @Inject(method = "renderVignetteOverlay", at = @At("HEAD"), cancellable = true)
-    public void cancelVignetteOverlay(DrawContext context, Entity entity, CallbackInfo ci) {
+    private void cancelVignetteOverlay(DrawContext context, Entity entity, CallbackInfo ci) {
         if (enabled) ci.cancel();
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
-    public void cancelSpyglassOverlay(DrawContext context, float scale, CallbackInfo ci) {
+    private void cancelSpyglassOverlay(DrawContext context, float scale, CallbackInfo ci) {
         if (enabled) ci.cancel();
     }
 
     @Inject(method = "renderOverlay", at = @At("HEAD"), cancellable = true)
-    public void cancelOverlay(DrawContext context, Identifier texture, float opacity, CallbackInfo ci) {
+    private void cancelOverlay(DrawContext context, Identifier texture, float opacity, CallbackInfo ci) {
         if (enabled) ci.cancel();
     }
 
@@ -192,12 +192,12 @@ public abstract class MixinInGameHud {
     @Unique private DrawContext context = null;
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING", args = "ldc=overlayMessage", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V"))
-    public void onActionbarRender(DrawContext context, float tickDelta, CallbackInfo ci) {
+    private void onActionbarRender(DrawContext context, float tickDelta, CallbackInfo ci) {
         if (enabled) renderingActionbar = true;
     }
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTextBackground(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/font/TextRenderer;III)V"))
-    public void renderActionbarBackground(Args args) {
+    private void renderActionbarBackground(Args args) {
         if (!renderingActionbar) return;
         context = args.get(0);
         Stereopsis.offsetHudPush(context, false);
@@ -207,7 +207,7 @@ public abstract class MixinInGameHud {
     }
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)I"))
-    public void renderActionbarText(Args args) {
+    private void renderActionbarText(Args args) {
         if (!renderingActionbar) return;
         context.getMatrices().pop();
         Stereopsis.offsetHudPush(context, false);
@@ -217,7 +217,7 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
-    public void endActionbarRender(DrawContext context, float tickDelta, CallbackInfo ci) {
+    private void endActionbarRender(DrawContext context, float tickDelta, CallbackInfo ci) {
         if (renderingActionbar) {
             context.getMatrices().pop();
             renderingActionbar = false;
