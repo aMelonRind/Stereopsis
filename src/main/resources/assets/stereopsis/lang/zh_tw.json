@@ -8,7 +8,7 @@
   "stereopsis.settings.enableOnLaunch": "啟動時啟用",
   "stereopsis.settings.enableOnLaunch.description": "如果開啟 會在遊戲啟動時自動啟用立體視",
   "stereopsis.settings.magicFixForShaders": "光影包的Magic Fix",
-  "stereopsis.settings.magicFixForShaders.description": "這會占用約0.8%的效能(沒其他模組, 新世界, 沒光影包). 如果你有用光影包, 你應該會想要打開這個. 這(希望)會修復光影渲染問題. 我(開發者)不知道這怎麼運作的, 所以這是個magic fix.",
+  "stereopsis.settings.magicFixForShaders.description": "這會占用約0.8%的效能(沒其他模組, 新世界, 沒光影包). 如果你有用光影包, 你應該會想要打開這個, 還有如果光影包有的話關閉動態模糊. 這(希望)會修復光影渲染問題. 我(開發者)不知道這怎麼運作的, 所以這是個magic fix.",
   "stereopsis.settings.maxXOffset": "最大橫向位移",
   "stereopsis.settings.maxXOffset.description": "讓視角聚焦在準心的最大位移",
   "stereopsis.settings.offsetSpeed": "橫向位移速度",

@@ -1,5 +1,6 @@
 package io.github.amelonrind.stereopsis.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.amelonrind.stereopsis.Stereopsis;
 import io.github.amelonrind.stereopsis.config.Config;
 import net.minecraft.client.MinecraftClient;
@@ -119,7 +120,10 @@ public abstract class MixinInGameHud {
 
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     private void moveHotbar(float tickDelta, DrawContext context, CallbackInfo ci) {
-        Stereopsis.moveHud("hotbar", context, ci, () -> renderHotbar(tickDelta, context));
+        Stereopsis.moveHud("hotbar", context, ci, () -> {
+            RenderSystem.enableBlend();
+            renderHotbar(tickDelta, context);
+        });
     }
 
     @Inject(method = "renderStatusBars", at = @At("HEAD"), cancellable = true)
