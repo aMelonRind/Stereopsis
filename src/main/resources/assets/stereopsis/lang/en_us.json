@@ -5,6 +5,8 @@
   "stereopsis.settings.title": "Stereopsis Config",
   "stereopsis.settings.flipView": "View Mode",
   "stereopsis.settings.flipView.description": "Switch between cross mode or parallel mode (Experimental).",
+  "stereopsis.settings.renderMode": "Render Mode",
+  "stereopsis.settings.renderMode.description": "The world render behavior when stereopsis is active.",
   "stereopsis.settings.enableOnLaunch": "Enable On Launch",
   "stereopsis.settings.enableOnLaunch.description": "If enabled, stereopsis will enable automatically on game launch.",
   "stereopsis.settings.maxXOffset": "Max Horizontal Offset",
@@ -13,5 +15,12 @@
   "stereopsis.settings.value.ar": "AR (Parallel) (Experimental)",
   "stereopsis.settings.value.cross": "Cross",
   "stereopsis.settings.value.instant": "Instant",
-  "stereopsis.settings.value.disabled": "Disabled"
+  "stereopsis.settings.value.disabled": "Disabled",
+
+  "stereopsis.render_mode.duo.name": "Duo",
+  "stereopsis.render_mode.duo.description": "Renders two sides at once, provides best experience if no shader pack is loaded.",
+  "stereopsis.render_mode.single.name": "Single",
+  "stereopsis.render_mode.single.description": "Renders one side at a time, attempts to fix shader pack glitches. If glitch persists, try F3+R (reload shaders).",
+  "stereopsis.render_mode.single_synced.name": "Single-Synced",
+  "stereopsis.render_mode.single_synced.description": "Same as Single, but skips client ticking when rendering second frame. Might cause some side effects."
 }

@@ -2,11 +2,13 @@ package io.github.amelonrind.stereopsis.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.amelonrind.stereopsis.RenderMode;
 import io.github.amelonrind.stereopsis.config.Config;
 import io.github.amelonrind.stereopsis.Stereopsis;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.PostEffectProcessor;
+import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -19,6 +21,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -29,10 +32,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -56,9 +56,14 @@ public abstract class MixinGameRenderer {
     @Unique private static PostEffectProcessor post = null;
     @Unique private static boolean flip = false;
     @Unique private static Framebuffer back = null;
+    @Unique private static Framebuffer cache = null;
     @Unique private static Framebuffer left = null;
     @Unique private static Framebuffer right = null;
     @Unique private static long lastFrameTime = System.nanoTime();
+
+    @Unique private static float yawCache = 0;
+    @Unique private static float pitchCache = 0;
+    @Unique private static boolean resetLook = false;
 
     @Unique private static Vec3d crosshair = null;
     @Unique private static Vec3d leftCrosshairPos = new Vec3d(0, 0, 0);
@@ -75,6 +80,7 @@ public abstract class MixinGameRenderer {
             back = post.getSecondaryTarget("back");
             left = post.getSecondaryTarget("left");
             right = post.getSecondaryTarget("right");
+            cache = new SimpleFramebuffer(left.viewportWidth, left.viewportHeight, true, MinecraftClient.IS_SYSTEM_MAC);
             flip = false;
             loaded = true;
             Stereopsis.LOGGER.info("Loaded post processor");
@@ -99,71 +105,126 @@ public abstract class MixinGameRenderer {
             post.close();
             post = null;
         }
-        left = right = null;
+        if (cache != null) {
+            cache.delete();
+            cache = null;
+        }
+        back = left = right = null;
     }
 
+    @Unique private boolean finishRender = false;
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
     public void renderStereopsis(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
-        screenAspectRatio = (float) client.getWindow().getFramebufferWidth() / client.getWindow().getFramebufferHeight();
         Stereopsis.resetHudOffset();
         if (enabled && !rendering) {
             rendering = true;
-            ci.cancel();
 
             if (Config.get().flipView != flip) {
                 Framebuffer temp = left;
                 left = right;
                 right = temp;
                 flip = !flip;
+                righting = !righting;
             }
 
             client.getProfiler().push("stereopsis-world");
-            crosshair = null;
-            leftCrosshair = null;
-            rightCrosshair = null;
+            client.getProfiler().push("prepare");
 
-            client.getProfiler().push("blit");
             back.clear(MinecraftClient.IS_SYSTEM_MAC);
-            left.clear(MinecraftClient.IS_SYSTEM_MAC);
-            right.clear(MinecraftClient.IS_SYSTEM_MAC);
             blit(client.getFramebuffer(), back);
-            blit(back, left);
-            blit(back, right);
 
-            client.getProfiler().swap("left");
-            Stereopsis.framebufferOverride = left;
-            left.beginWrite(true);
-            righting = false;
-            renderWorld(tickDelta, limitTime, matrices);
-            client.worldRenderer.drawEntityOutlinesFramebuffer();
+            if (RenderMode.isDuo()) {
+                ci.cancel();
+                crosshair = null;
 
-            client.getProfiler().swap("right");
-            Stereopsis.framebufferOverride = right;
-            right.beginWrite(true);
-            righting = true;
-            renderWorld(tickDelta, limitTime, new MatrixStack());
-            client.worldRenderer.drawEntityOutlinesFramebuffer();
+                leftCrosshair = null;
+                setupSide("left", cache, false);
+                renderWorld(tickDelta, limitTime, matrices);
+                client.worldRenderer.drawEntityOutlinesFramebuffer();
 
-            Framebuffer outlines = client.worldRenderer.getEntityOutlinesFramebuffer();
-            if (outlines != null) outlines.clear(MinecraftClient.IS_SYSTEM_MAC);
-            Stereopsis.framebufferOverride = null;
-            client.getProfiler().swap("render");
-            ((MixinAccessPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(xOffset));
-            RenderSystem.disableCull();
-            RenderSystem.disableBlend();
-            RenderSystem.disableDepthTest();
-            post.render(tickDelta);
-            client.getFramebuffer().beginWrite(false);
-            RenderSystem.enableCull();
+                rightCrosshair = null;
+                setupSide("right", right, true);
+                renderWorld(tickDelta, limitTime, new MatrixStack());
 
-            client.getProfiler().pop();
-            client.getProfiler().pop();
-            rendering = false;
+                blit(cache, left);
+                finishRender(tickDelta);
+            } else {
+                if (righting) {
+                    crosshair = null;
+
+                    leftCrosshair = null;
+                    if (RenderMode.isSynced()) {
+                        setupSide("left", cache, false);
+                        yawCache = camera.getYaw();
+                        pitchCache = camera.getPitch();
+                        skipNextTick = true;
+                    } else {
+                        setupSide("left", left, false);
+                    }
+                } else {
+                    rightCrosshair = null;
+                    setupSide("right", right, true);
+                    skipNextTick = false; // this is just for safe, actual one is in MixinMinecraftClient
+                    if (RenderMode.isSynced()) { // for some reason camera look is still updated even when ticking is skipped, so we need to do this.
+                        blit(cache, left);
+                        float temp = camera.getYaw();
+                        float temp2 = camera.getPitch();
+                        ((MixinAccessCamera) camera).callSetRotation(yawCache, pitchCache);
+                        yawCache = temp;
+                        pitchCache = temp2;
+                        resetLook = true;
+                    }
+                }
+                finishRender = true;
+            }
         }
     }
 
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/BlockView;Lnet/minecraft/entity/Entity;ZZF)V"))
-    public void shiftCamera(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    @Inject(method = "renderWorld", at = @At("TAIL"))
+    public void renderStereopsisEnd(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+        if (finishRender) {
+            finishRender = false;
+            finishRender(tickDelta);
+            if (resetLook) {
+                resetLook = false;
+                ((MixinAccessCamera) camera).callSetRotation(yawCache, pitchCache);
+            }
+        }
+    }
+
+    @Unique
+    private void setupSide(String name, @NotNull Framebuffer frame, boolean right) {
+        client.getProfiler().swap(name);
+        frame.clear(MinecraftClient.IS_SYSTEM_MAC);
+        blit(back, frame);
+        Stereopsis.framebufferOverride = frame;
+        frame.beginWrite(false);
+        righting = right;
+    }
+
+    @Unique
+    private void finishRender(float tickDelta) {
+        client.worldRenderer.drawEntityOutlinesFramebuffer();
+        Framebuffer outlines = client.worldRenderer.getEntityOutlinesFramebuffer();
+        if (outlines != null) outlines.clear(MinecraftClient.IS_SYSTEM_MAC);
+        Stereopsis.framebufferOverride = null;
+        client.getProfiler().swap("render");
+        ((MixinAccessPostEffectProcessor) post).getPasses().forEach(pass -> pass.getProgram().getUniformByNameOrDummy("XOffset").set(xOffset));
+        RenderSystem.disableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.disableDepthTest();
+        post.render(tickDelta);
+        client.getFramebuffer().beginWrite(false);
+        RenderSystem.enableCull();
+
+        client.getProfiler().pop();
+        client.getProfiler().pop();
+        rendering = false;
+    }
+
+    @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/BlockView;Lnet/minecraft/entity/Entity;ZZF)V"))
+    public void shiftCamera(Camera instance, BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
+        if (!resetLook) instance.update(area, focusedEntity, thirdPerson, inverseView, tickDelta);
         if (enabled) {
             ((MixinAccessCamera) camera).callMoveBy(0, 0, righting ? -eyeRadius : eyeRadius);
             if (!righting) {
@@ -238,7 +299,11 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "onResized", at = @At("TAIL"))
     public void onResized(int width, int height, CallbackInfo ci) {
-        if (loaded) post.setupDimensions(width, height);
+        screenAspectRatio = (float) width / height;
+        if (loaded) {
+            post.setupDimensions(width, height);
+            cache.resize(left.viewportWidth, left.viewportHeight, MinecraftClient.IS_SYSTEM_MAC);
+        }
     }
 
     @Unique

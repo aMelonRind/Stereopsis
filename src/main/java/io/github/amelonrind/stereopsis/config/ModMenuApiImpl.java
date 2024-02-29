@@ -7,8 +7,10 @@ import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
+import io.github.amelonrind.stereopsis.RenderMode;
 import io.github.amelonrind.stereopsis.Stereopsis;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -24,6 +26,7 @@ public class ModMenuApiImpl implements ModMenuApi {
     private static final Text CROSS_TEXT = translatable("value.cross");
     private static final Text INSTANT_TEXT = translatable("value.instant");
     private static final Text DISABLED_TEXT = translatable("value.disabled");
+    private static final Text RENDER_MODE_DESCRIPTION = translatable("renderMode.description");
 
     @Contract(value = "_ -> new", pure = true)
     private static @NotNull MutableText translatable(String key) {
@@ -39,6 +42,7 @@ public class ModMenuApiImpl implements ModMenuApi {
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return p -> {
             Config cfg = Config.get();
+            RenderMode.set(cfg.renderMode);
             return YetAnotherConfigLib.createBuilder()
                     .title(translatable("title"))
                     .category(ConfigCategory.createBuilder()
@@ -50,6 +54,14 @@ public class ModMenuApiImpl implements ModMenuApi {
                                     .controller(opt -> BooleanControllerBuilder.create(opt)
                                             .formatValue(val -> val ? AR_TEXT : CROSS_TEXT)
                                             .coloured(false))
+                                    .build())
+                            .option(Option.<RenderMode>createBuilder()
+                                    .name(translatable("renderMode"))
+                                    .description(mode -> OptionDescription.of(RENDER_MODE_DESCRIPTION, Text.empty(), mode.getDescription()))
+                                    .binding(def.renderMode, () -> cfg.renderMode, val -> cfg.renderMode = val)
+                                    .controller(opt -> EnumControllerBuilder.create(opt)
+                                            .enumClass(RenderMode.class)
+                                            .formatValue(RenderMode::getName))
                                     .build())
                             .option(Option.<Boolean>createBuilder()
                                     .name(translatable("enableOnLaunch"))
@@ -75,7 +87,10 @@ public class ModMenuApiImpl implements ModMenuApi {
                                             .formatValue(val -> val < 0 ? INSTANT_TEXT : val == 0 ? DISABLED_TEXT : Text.literal(df.format(val))))
                                     .build())
                             .build())
-                    .save(Config.HANDLER::save)
+                    .save(() -> {
+                        cfg.apply();
+                        Config.HANDLER.save();
+                    })
                     .build()
                     .generateScreen(p);
         };

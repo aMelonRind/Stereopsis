@@ -9,4 +9,6 @@ public interface MixinAccessCamera {
 
     @Invoker void callMoveBy(double x, double y, double z);
 
+    @Invoker void callSetRotation(float yaw, float pitch);
+
 }

@@ -31,6 +31,7 @@ public class Stereopsis implements ClientModInitializer {
     public static boolean devGpuPatch = false;
     public static boolean enabled = false;
     public static boolean loaded = false;
+    public static boolean skipNextTick = false;
     public static boolean rendering = false;
     public static boolean righting = false;
     public static @Nullable Framebuffer framebufferOverride = null;
@@ -52,7 +53,7 @@ public class Stereopsis implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Config.HANDLER.load();
-        Config.get().fixValues();
+        Config.get().apply();
         if (Config.get().enableOnLaunch) enabled = true;
         KeyBinding key = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.stereopsis.toggle",
