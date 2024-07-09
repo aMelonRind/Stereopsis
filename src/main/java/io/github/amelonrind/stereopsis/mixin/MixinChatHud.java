@@ -15,7 +15,7 @@ import static io.github.amelonrind.stereopsis.Stereopsis.mc;
 @Mixin(ChatHud.class)
 public abstract class MixinChatHud {
 
-    @Shadow protected abstract boolean isChatFocused();
+    @Shadow public abstract boolean isChatFocused();
 
     @Shadow public abstract void reset();
 

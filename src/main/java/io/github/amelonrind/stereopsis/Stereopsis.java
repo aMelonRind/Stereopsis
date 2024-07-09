@@ -5,7 +5,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-//import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
@@ -15,7 +14,6 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-//import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -63,7 +61,7 @@ public class Stereopsis implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             while (key.wasPressed()) {
                 enabled = loaded && !enabled;
-                if (loaded) LOGGER.info("Stereopsis has been " + (enabled ? "enabled" : "disabled"));
+                if (loaded) LOGGER.info("Stereopsis has been {}", enabled ? "enabled" : "disabled");
                 else LOGGER.info("Cannot enable stereopsis: post shader not loaded");
             }
         });
@@ -119,25 +117,5 @@ public class Stereopsis implements ClientModInitializer {
         float off = getHudOffset();
         context.getMatrices().translate(righting ? -off : off, 0, 0);
     }
-
-    // for debug purpose
-//    public static void renderMatrix(TextRenderer textRenderer, DrawContext context, Matrix4f mat, int x, int y) {
-//        if (mat == null) return;
-//        for (int r = 0; r < 4; r++) for (int c = 0; c < 4; c++) {
-//            String str = Float.toString(mat.get(c, r));
-//            if (str.length() > 6) str = str.substring(0, 6);
-//            context.drawTextWithShadow(textRenderer, str, x + c * 48, y + r * 12, 0xffffff);
-//        }
-//    }
-
-    // for debug purpose
-//    public static void renderVector(TextRenderer textRenderer, DrawContext context, Vector4f vec, int x, int y) {
-//        if (vec == null) return;
-//        for (int i = 0; i < 4; i++) {
-//            String str = Float.toString(vec.get(i));
-//            if (str.length() > 6) str = str.substring(0, 6);
-//            context.drawTextWithShadow(textRenderer, str, x + i * 48, y, 0xffffff);
-//        }
-//    }
 
 }

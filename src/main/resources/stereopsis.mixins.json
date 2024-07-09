@@ -3,11 +3,13 @@
   "minVersion": "0.8",
   "package": "io.github.amelonrind.stereopsis.mixin",
   "plugin": "io.github.amelonrind.stereopsis.mixin.ConfigPluginImpl",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
   ],
   "client": [
     "MixinAccessCamera",
+    "MixinAccessEntityRenderer",
+    "MixinAccessHeldItemRenderer",
     "MixinAccessPostEffectProcessor",
     "MixinChatHud",
     "MixinFishingBobberEntityRenderer",
@@ -17,6 +19,7 @@
     "MixinMinecraftClient",
     "MixinPostEffectProcessor",
     "MixinSpectatorHud",
+    "MixinSubtitlesHud",
     "devgpupatch.MixinGameRenderer",
     "devgpupatch.MixinVertexBuffer"
   ],

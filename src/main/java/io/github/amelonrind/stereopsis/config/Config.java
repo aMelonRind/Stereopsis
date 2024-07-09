@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 
 public class Config {
     public static final ConfigClassHandler<Config> HANDLER = ConfigClassHandler.createBuilder(Config.class)
-            .id(new Identifier(Stereopsis.MOD_ID, "main"))
+            .id(Identifier.of(Stereopsis.MOD_ID, "main"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve(Stereopsis.MOD_ID + ".json5"))
                     .setJson5(true)

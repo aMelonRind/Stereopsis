@@ -1,5 +1,6 @@
 package io.github.amelonrind.stereopsis.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.amelonrind.stereopsis.config.Config;
@@ -11,6 +12,7 @@ import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -46,14 +48,14 @@ public abstract class MixinGameRenderer {
 
     @Shadow @Final private Camera camera;
 
-    @Shadow public abstract void renderWorld(float tickDelta, long limitTime, MatrixStack matrices);
+    @Shadow public abstract void renderWorld(RenderTickCounter tickCounter);
 
-    @Shadow protected abstract void renderFloatingItem(int scaledWidth, int scaledHeight, float tickDelta);
+    @Shadow protected abstract void renderFloatingItem(DrawContext context, float tickDelta);
 
     @Unique private static final double PI2 = Math.PI / 2;
     @Unique private static final double D2R = Math.PI / 180;
-    @Unique private static final double eyeRadius = 0.1;
-    @Unique private static final Identifier postId = new Identifier("stereopsis:shaders/post/stereopsis.json");
+    @Unique private static final float eyeRadius = 0.1f;
+    @Unique private static final Identifier postId = Identifier.of(MOD_ID, "shaders/post/stereopsis.json");
     @Unique private static PostEffectProcessor post = null;
     @Unique private static boolean flip = false;
     @Unique private static Framebuffer back = null;
@@ -110,7 +112,7 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
-    private void renderStereopsis(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    private void renderStereopsis(RenderTickCounter tickCounter, CallbackInfo ci) {
         Stereopsis.resetHudOffset();
         if (enabled && !rendering) {
             rendering = true;
@@ -135,11 +137,11 @@ public abstract class MixinGameRenderer {
             blit(client.getFramebuffer(), back);
 
             setupSide("left", doMagic ? cache : left, false);
-            renderWorld(tickDelta, limitTime, matrices);
+            renderWorld(tickCounter);
             client.worldRenderer.drawEntityOutlinesFramebuffer();
 
             setupSide("right", right, true);
-            renderWorld(tickDelta, limitTime, new MatrixStack());
+            renderWorld(tickCounter);
             client.worldRenderer.drawEntityOutlinesFramebuffer();
 
             Framebuffer outlines = client.worldRenderer.getEntityOutlinesFramebuffer();
@@ -151,7 +153,7 @@ public abstract class MixinGameRenderer {
             RenderSystem.disableCull();
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
-            post.render(tickDelta);
+            post.render(tickCounter.getTickDelta(true));
             client.getFramebuffer().beginWrite(false);
             RenderSystem.enableCull();
 
@@ -172,13 +174,14 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/BlockView;Lnet/minecraft/entity/Entity;ZZF)V"))
-    private void shiftCamera(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    private void shiftCamera(RenderTickCounter tickCounter, CallbackInfo ci) {
         if (enabled) {
-            ((MixinAccessCamera) camera).callMoveBy(0, 0, righting ? -eyeRadius : eyeRadius);
+            ((MixinAccessCamera) camera).callMoveBy(0, 0, righting ? eyeRadius : -eyeRadius);
             if (!righting) {
                 double to = 0.0;
                 if (client.world != null && (client.cameraEntity != null || client.player != null)) {
                     Entity cam = client.cameraEntity != null ? client.cameraEntity : client.player;
+                    float tickDelta = tickCounter.getTickDelta(true);
                     Vec3d start = cam.getCameraPosVec(tickDelta);
                     Vec3d rot = cam.getRotationVec(tickDelta);
                     Vec3d end = start.add(rot.multiply(16.0));
@@ -276,23 +279,29 @@ public abstract class MixinGameRenderer {
         return projectionMatrix;
     }
 
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V"))
-    private void calculateCrosshairAndMoveHand(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V"))
+    private void calculateCrosshairAndMoveHand(RenderTickCounter tickCounter, CallbackInfo ci, @Local MatrixStack matrices, @Local(ordinal = 1) Matrix4f matrix) {
         if (rendering && !client.options.hudHidden) {
             // could be better, but I can't  -aMelonRind
             // seems like only the x is correct, y is jumping at a large range which is obviously wrong
-            Vector4f vec = transform(righting ? rightCrosshairPos : leftCrosshairPos, matrices, righting ? rightMatrix : leftMatrix);
+            Vector4f vec = transform(righting ? rightCrosshairPos : leftCrosshairPos, righting ? rightMatrix : leftMatrix, matrix);
             if (righting ^ flip) rightCrosshair = vec;
             else leftCrosshair = vec;
         }
     }
 
+    @Unique
+    private Vector4f transform(@NotNull Vec3d offset, Matrix4f projection, Matrix4f position) {
+        Vector4f vec = new Vector4f(offset.toVector3f(), 1.0f).mul(position).mul(projection);
+        return vec.div(vec.w);
+    }
+
     @Unique private boolean fItemSide = false;
-    @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(IIF)V"))
+    @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(Lnet/minecraft/client/gui/DrawContext;F)V"))
     private void splitFloatingItem(Args args) {
         if (enabled) {
             fItemSide = false;
-            renderFloatingItem(args.get(0), args.get(1), args.get(2));
+            renderFloatingItem(args.get(0), args.get(1));
             fItemSide = true;
         }
     }
@@ -310,16 +319,6 @@ public abstract class MixinGameRenderer {
     private DrawContext moveToast(DrawContext context) {
         Stereopsis.moveSideHud("toast", context, false, () -> client.getToastManager().draw(context));
         return context;
-    }
-
-    @Unique
-    private Vector4f transform(@NotNull Vec3d offset, @NotNull MatrixStack stack, Matrix4f projection) {
-        stack.push();
-        stack.translate(offset.x, offset.y, offset.z);
-        Vector4f vec = new Vector4f().mul(stack.peek().getPositionMatrix());
-        vec.mul(projection);
-        stack.pop();
-        return vec.div(vec.w);
     }
 
 }
