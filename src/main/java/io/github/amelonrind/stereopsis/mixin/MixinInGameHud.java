@@ -11,14 +11,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.JumpingMount;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.util.Identifier;
-import org.joml.Vector4f;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
@@ -81,24 +80,34 @@ public abstract class MixinInGameHud {
         }
     }
 
-    @ModifyArg(method = "renderCrosshair", index = 0, at = @At(value = "INVOKE", remap = false, target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;"))
-    private float move3DCrosshair(float x) {
+    @ModifyArgs(method = "renderCrosshair", at = @At(value = "INVOKE", remap = false, target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;"))
+    private void move3DCrosshair(Args args) {
         if (rendering) {
+            float x = args.get(0);
+            float y = args.get(1);
             x += (righting ? -offset : offset);
-            Vector4f crosshair = righting ? rightCrosshair : leftCrosshair;
-            if (crosshair != null) x += crosshair.x * client.getWindow().getScaledWidth() / 2;
+            Vector3f crosshair = righting ? rightCrosshair : leftCrosshair;
+            if (crosshair != null) {
+                x += crosshair.x * client.getWindow().getScaledWidth() / 2;
+                y += crosshair.y * -client.getWindow().getScaledHeight() / 2;
+            }
+            args.set(0, x);
+            args.set(1, y);
         }
-        return x;
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;)V"))
     private void moveNormalCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (rendering) {
-            float off = (righting ? -offset : offset);
-            Vector4f crosshair = righting ? rightCrosshair : leftCrosshair;
-            if (crosshair != null) off += crosshair.x * context.getScaledWindowWidth() / 2;
+            float x = (righting ? -offset : offset);
+            float y = 0;
+            Vector3f crosshair = righting ? rightCrosshair : leftCrosshair;
+            if (crosshair != null) {
+                x += crosshair.x * context.getScaledWindowWidth() / 2;
+                y += crosshair.y * -context.getScaledWindowHeight() / 2;
+            }
             context.getMatrices().push();
-            context.getMatrices().translate(off, 0, 0);
+            context.getMatrices().translate(x, y, 0);
             wasPushed = true;
         }
     }

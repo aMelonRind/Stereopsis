@@ -13,7 +13,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.resource.ResourceFactory;
@@ -25,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
-import org.joml.Vector4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30C;
 import org.spongepowered.asm.mixin.Final;
@@ -67,8 +66,6 @@ public abstract class MixinGameRenderer {
     @Unique private static Vec3d crosshair = null;
     @Unique private static Vec3d leftCrosshairPos = new Vec3d(0, 0, 0);
     @Unique private static Vec3d rightCrosshairPos = new Vec3d(0, 0, 0);
-    @Unique private static final Matrix4f leftMatrix = new Matrix4f();
-    @Unique private static final Matrix4f rightMatrix = new Matrix4f();
 
     @Inject(method = "loadPrograms", at = @At("TAIL"))
     private void loadPrograms(ResourceFactory factory, CallbackInfo ci) {
@@ -271,29 +268,14 @@ public abstract class MixinGameRenderer {
         }
     }
 
-    @ModifyArg(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;loadProjectionMatrix(Lorg/joml/Matrix4f;)V"))
-    private Matrix4f loadProjectionMatrix(Matrix4f projectionMatrix) {
-        if (rendering && !client.options.hudHidden) {
-            (righting ? rightMatrix : leftMatrix).identity().mul(projectionMatrix);
-        }
-        return projectionMatrix;
-    }
-
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V"))
-    private void calculateCrosshairAndMoveHand(RenderTickCounter tickCounter, CallbackInfo ci, @Local MatrixStack matrices, @Local(ordinal = 1) Matrix4f matrix) {
+    private void calculateCrosshairAndMoveHand(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f projection, @Local(ordinal = 1) Matrix4f position) {
         if (rendering && !client.options.hudHidden) {
-            // could be better, but I can't  -aMelonRind
-            // seems like only the x is correct, y is jumping at a large range which is obviously wrong
-            Vector4f vec = transform(righting ? rightCrosshairPos : leftCrosshairPos, righting ? rightMatrix : leftMatrix, matrix);
+            Vector3f vec = (righting ? rightCrosshairPos : leftCrosshairPos)
+                    .toVector3f().mulPosition(position).mulProject(projection);
             if (righting ^ flip) rightCrosshair = vec;
             else leftCrosshair = vec;
         }
-    }
-
-    @Unique
-    private Vector4f transform(@NotNull Vec3d offset, Matrix4f projection, Matrix4f position) {
-        Vector4f vec = new Vector4f(offset.toVector3f(), 1.0f).mul(position).mul(projection);
-        return vec.div(vec.w);
     }
 
     @Unique private boolean fItemSide = false;
