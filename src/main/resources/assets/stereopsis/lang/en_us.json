@@ -15,5 +15,6 @@
   "stereopsis.settings.value.ar": "AR (Parallel) (Experimental)",
   "stereopsis.settings.value.cross": "Cross",
   "stereopsis.settings.value.instant": "Instant",
-  "stereopsis.settings.value.disabled": "Disabled"
+  "stereopsis.settings.value.disabled": "Disabled",
+  "stereopsis.settings.hudOffset": "HUD Offset"
 }
