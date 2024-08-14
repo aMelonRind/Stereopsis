@@ -9,15 +9,19 @@
   "stereopsis.settings.enableOnLaunch.description": "この設定を有効にすると、起動時に立体視が有効になります",
   "stereopsis.settings.magicFixForShaders": "影の修正",
   "stereopsis.settings.magicFixForShaders.description": "シェーダーパックを使用する場合は、この設定を有効化することをお勧めします (この機能は、0.8%ほどパフォーマンスに影響します)",
+  "stereopsis.settings.lockCrosshairY": "クロスヘアの垂直オフセットを固定",
+  "stereopsis.settings.lockCrosshairY.description": "クロスヘアの垂直オフセットを固定します",
   "stereopsis.settings.maxXOffset": "最大水平オフセット",
   "stereopsis.settings.maxXOffset.description": "焦点を合わせるための移動の最大値",
   "stereopsis.settings.offsetSpeed": "水平オフセットの変更速度",
   "stereopsis.settings.offsetSpeed.description": "焦点を合わせるための移動速度",
-  "stereopsis.settings.hudOffset": "HUDオフセット",
+  "stereopsis.settings.inverseHudXOffsetDirection": "HUDの水平オフセットを反転",
+  "stereopsis.settings.inverseHudXOffsetDirection.description": "この設定を有効にすると、HUDの水平オフセットの方向を反転反転します",
+  "stereopsis.settings.hudOffset": "HUDの水平オフセット",
   "stereopsis.settings.hudOffset.description": "HUDの水平オフセット (HUDの前後位置の調整)",
 
   "stereopsis.settings.value.ar": "AR(平行法) (試験的機能)",
   "stereopsis.settings.value.cross": "クロス(交叉法)",
-  "stereopsis.settings.value.instant": "すぐに",
+  "stereopsis.settings.value.instant": "即時",
   "stereopsis.settings.value.disabled": "無効"
 }
