@@ -14,7 +14,7 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector4f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +35,8 @@ public class Stereopsis implements ClientModInitializer {
 
     public static float screenAspectRatio = 1.0f;
     public static float xOffset = 0.0f;
-    public static Vector4f leftCrosshair;
-    public static Vector4f rightCrosshair;
+    public static Vector3f leftCrosshair;
+    public static Vector3f rightCrosshair;
 
     private static boolean renderingHud = false;
 
@@ -74,7 +74,9 @@ public class Stereopsis implements ClientModInitializer {
     public static float getHudOffset() {
         if (hudOffset == -1.0f) {
             int width = mc.getWindow().getScaledWidth();
-            hudOffset = (width / 4.0f + -xOffset * width + (Config.get().hudOffset) / screenAspectRatio);
+            hudOffset = width / 4.0f
+                    - (Config.get().inverseHudXOffsetDirection ? -xOffset : xOffset) * width
+                    + (120 + Config.get().hudOffset) / screenAspectRatio;
             if (hudOffset < HUD_HALF_WIDTH) hudOffset = HUD_HALF_WIDTH;
             int max = width / 2 - HUD_HALF_WIDTH;
             if (hudOffset > max) hudOffset = max;

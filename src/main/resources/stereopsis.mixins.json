@@ -12,7 +12,6 @@
     "MixinAccessHeldItemRenderer",
     "MixinAccessPostEffectProcessor",
     "MixinChatHud",
-    "MixinFishingBobberEntityRenderer",
     "MixinGameRenderer",
     "MixinHeldItemRenderer",
     "MixinInGameHud",
