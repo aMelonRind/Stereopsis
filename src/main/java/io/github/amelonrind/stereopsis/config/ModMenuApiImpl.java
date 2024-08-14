@@ -75,6 +75,7 @@ public class ModMenuApiImpl implements ModMenuApi {
                                     .build())
                             .option(Option.<Float>createBuilder()
                                     .name(translatable("offsetSpeed"))
+                                    .description(descriptionOf("offsetSpeed"))
                                     .binding(def.offsetSpeed, () -> cfg.offsetSpeed, val -> cfg.offsetSpeed = val < 0 ? -1.0f : val)
                                     .controller(opt -> FloatSliderControllerBuilder.create(opt)
                                             .range(-0.001f, 8.0f)

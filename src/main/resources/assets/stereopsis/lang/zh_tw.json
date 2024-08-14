@@ -12,9 +12,11 @@
   "stereopsis.settings.maxXOffset": "最大橫向位移",
   "stereopsis.settings.maxXOffset.description": "讓視角聚焦在準心的最大位移",
   "stereopsis.settings.offsetSpeed": "橫向位移速度",
+  "stereopsis.settings.offsetSpeed.description": "",
   "stereopsis.settings.value.ar": "AR (平行法) (實驗性)",
   "stereopsis.settings.value.cross": "交叉法",
   "stereopsis.settings.value.instant": "即時",
   "stereopsis.settings.value.disabled": "禁用",
-  "stereopsis.settings.hudOffset": "HUD橫向位移"
+  "stereopsis.settings.hudOffset": "HUD橫向位移",
+  "stereopsis.settings.hudOffset.description": "HUDの水平オフセット (HUDの前後位置の調整)"
 }
