@@ -89,7 +89,9 @@ public abstract class MixinInGameHud {
             Vector3f crosshair = righting ? rightCrosshair : leftCrosshair;
             if (crosshair != null) {
                 x += crosshair.x * client.getWindow().getScaledWidth() / 2;
-                y += crosshair.y * -client.getWindow().getScaledHeight() / 2;
+                if (!Config.get().lockCrosshairY) {
+                    y += crosshair.y * -client.getWindow().getScaledHeight() / 2;
+                }
             }
             args.set(0, x);
             args.set(1, y);
@@ -104,7 +106,9 @@ public abstract class MixinInGameHud {
             Vector3f crosshair = righting ? rightCrosshair : leftCrosshair;
             if (crosshair != null) {
                 x += crosshair.x * context.getScaledWindowWidth() / 2;
-                y += crosshair.y * -context.getScaledWindowHeight() / 2;
+                if (!Config.get().lockCrosshairY) {
+                    y += crosshair.y * -context.getScaledWindowHeight() / 2;
+                }
             }
             context.getMatrices().push();
             context.getMatrices().translate(x, y, 0);

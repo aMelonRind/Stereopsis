@@ -29,11 +29,17 @@ public class Config {
     @SerialEntry(comment = "This takes around 0.8% of performance (no other mod, new world, no shaders). If you're using shader pack, you probably want this to be on. It will (hopefully) fix shader rendering problem. I (dev) have no idea how this works, so it's a magic fix.")
     public boolean magicFixForShaders = false;
 
+    @SerialEntry(comment = "Locks the Y value of crosshair to center")
+    public boolean lockCrosshairY = false;
+
     @SerialEntry(comment = "The max offset for the view to focus on the crosshair. This value shouldn't be higher than 0.25")
     public float maxXOffset = 0.25f;
 
     @SerialEntry(comment = "The speed of the horizontal offset. negative for instant")
     public float offsetSpeed = 1.0f;
+
+    @SerialEntry(comment = "Decides if the HUD xOffset should be in inverse")
+    public boolean inverseHudXOffsetDirection = false;
 
     @SerialEntry(comment = "The offset of the HUD")
     public int hudOffset = 0;

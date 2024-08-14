@@ -9,14 +9,19 @@
   "stereopsis.settings.enableOnLaunch.description": "如果開啟 會在遊戲啟動時自動啟用立體視",
   "stereopsis.settings.magicFixForShaders": "光影包的Magic Fix",
   "stereopsis.settings.magicFixForShaders.description": "這會占用約0.8%的效能(沒其他模組, 新世界, 沒光影包). 如果你有用光影包, 你應該會想要打開這個, 還有如果光影包有的話關閉動態模糊. 這(希望)會修復光影渲染問題. 我(開發者)不知道這怎麼運作的, 所以這是個magic fix.",
+  "stereopsis.settings.lockCrosshairY": "禁用準星垂直位移",
+  "stereopsis.settings.lockCrosshairY.description": "",
   "stereopsis.settings.maxXOffset": "最大橫向位移",
-  "stereopsis.settings.maxXOffset.description": "讓視角聚焦在準心的最大位移",
+  "stereopsis.settings.maxXOffset.description": "讓視角聚焦在準星的最大位移",
   "stereopsis.settings.offsetSpeed": "橫向位移速度",
   "stereopsis.settings.offsetSpeed.description": "",
+  "stereopsis.settings.inverseHudXOffsetDirection": "反轉HUD的xOffset方向",
+  "stereopsis.settings.inverseHudXOffsetDirection.description": "決定xOffset(被準星目標距離影響的數值)是否應該在HUD反轉",
+  "stereopsis.settings.hudOffset": "HUD橫向位移",
+  "stereopsis.settings.hudOffset.description": "",
+
   "stereopsis.settings.value.ar": "AR (平行法) (實驗性)",
   "stereopsis.settings.value.cross": "交叉法",
   "stereopsis.settings.value.instant": "即時",
-  "stereopsis.settings.value.disabled": "禁用",
-  "stereopsis.settings.hudOffset": "HUD橫向位移",
-  "stereopsis.settings.hudOffset.description": "HUDの水平オフセット (HUDの前後位置の調整)"
+  "stereopsis.settings.value.disabled": "禁用"
 }
