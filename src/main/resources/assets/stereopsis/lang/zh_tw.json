@@ -15,5 +15,6 @@
   "stereopsis.settings.value.ar": "AR (平行法) (實驗性)",
   "stereopsis.settings.value.cross": "交叉法",
   "stereopsis.settings.value.instant": "即時",
-  "stereopsis.settings.value.disabled": "禁用"
+  "stereopsis.settings.value.disabled": "禁用",
+  "stereopsis.settings.hudOffset": "HUD橫向位移"
 }

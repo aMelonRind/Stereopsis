@@ -8,6 +8,7 @@ import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
+import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import io.github.amelonrind.stereopsis.Stereopsis;
 import net.minecraft.text.MutableText;
@@ -79,6 +80,15 @@ public class ModMenuApiImpl implements ModMenuApi {
                                             .range(-0.001f, 8.0f)
                                             .step(0.001f)
                                             .formatValue(val -> val < 0 ? INSTANT_TEXT : val == 0 ? DISABLED_TEXT : Text.literal(df.format(val))))
+                                    .build())
+                            .option(Option.<Integer>createBuilder()
+                                    .name(translatable("hudOffset"))
+                                    .description(descriptionOf("hudOffset"))
+                                    .binding(def.hudOffset, () -> cfg.hudOffset, val -> cfg.hudOffset = val)
+                                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                                .range(0, 255)
+                                                .step(10)
+                                                .formatValue(val -> Text.literal(String.valueOf(val))))
                                     .build())
                             .build())
                     .save(Config.HANDLER::save)
