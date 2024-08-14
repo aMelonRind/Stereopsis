@@ -36,12 +36,12 @@ public class Config {
     public float offsetSpeed = 1.0f;
 
     @SerialEntry(comment = "The offset of the HUD")
-    public int hudOffset = 120;
+    public int hudOffset = 0;
 
     public void fixValues() {
         if (maxXOffset < 0.0f) maxXOffset = 0.0f;
         if (maxXOffset > 0.25f) maxXOffset = 0.25f;
-         if (hudOffset < 0 || hudOffset > 255) hudOffset = 120;
+        if (Math.abs(hudOffset) > 255) hudOffset = 0;
     }
 
 }

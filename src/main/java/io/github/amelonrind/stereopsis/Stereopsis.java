@@ -74,7 +74,7 @@ public class Stereopsis implements ClientModInitializer {
     public static float getHudOffset() {
         if (hudOffset == -1.0f) {
             int width = mc.getWindow().getScaledWidth();
-            hudOffset = (width / 4.0f + -xOffset * width + (Config.get().hudOffset) / screenAspectRatio);
+            hudOffset = (width / 4.0f + -xOffset * width + (120 + Config.get().hudOffset) / screenAspectRatio);
             if (hudOffset < HUD_HALF_WIDTH) hudOffset = HUD_HALF_WIDTH;
             int max = width / 2 - HUD_HALF_WIDTH;
             if (hudOffset > max) hudOffset = max;
