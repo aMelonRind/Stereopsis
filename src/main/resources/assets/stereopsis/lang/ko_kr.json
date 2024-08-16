@@ -1,0 +1,27 @@
+{
+  "key.stereopsis.toggle": "토글",
+  "key.stereopsis.category": "Stereopsis",
+
+  "stereopsis.settings.title": "Stereopsis 설정",
+  "stereopsis.settings.flipView": "보기 모드",
+  "stereopsis.settings.flipView.description": "크로스 모드는 눈이 교차되어서 보게 되고, 평행 모드는 눈이 직선으로 보게 됩니다.(실험)",
+  "stereopsis.settings.enableOnLaunch": "기본으로 켜기",
+  "stereopsis.settings.enableOnLaunch.description": "게임이 켜질 떄 자동으로 활성화될지 정합니다.",
+  "stereopsis.settings.magicFixForShaders": "셰이더를 위한 마법의 해결",
+  "stereopsis.settings.magicFixForShaders.description": "이렇게 하게 되면 성능이 약 0.8% 감소합니다.(다른 모드 없음, 새로운 세계, 셰이더 없음) 셰이더 팩을 사용하는 경우 이 기능을 켜는 것이 좋습니다. 셰이더 팩에 모션 블러가 있는 경우 비활성화해 주세요. (아마도) 셰이더 렌더링 문제가 해결될 것입니다. 저는(개발자) 이것이 어떻게 작동하는지 전혀 모르기 때문에 마법 같은 해결책입니다.",
+  "stereopsis.settings.lockCrosshairY": "조준선 수직 위치 조정 끄기",
+  "stereopsis.settings.lockCrosshairY.description": "",
+  "stereopsis.settings.maxXOffset": "최대 평행 조정값",
+  "stereopsis.settings.maxXOffset.description": "조준선에 초점을 맞추기 위해 적용될 평행 조절 값의 최대값입니다.",
+  "stereopsis.settings.offsetSpeed": "평행 조절 속도",
+  "stereopsis.settings.offsetSpeed.description": "",
+  "stereopsis.settings.inverseHudXOffsetDirection": "HUD x값 반전",
+  "stereopsis.settings.inverseHudXOffsetDirection.description": "x값(조준선 초점 대상 거리의 영향을 받음)이 HUD에서 반전되어 적용됩니다.",
+  "stereopsis.settings.hudOffset": "HUD 위치",
+  "stereopsis.settings.hudOffset.description": "",
+
+  "stereopsis.settings.value.ar": "AR (평행) (실험)",
+  "stereopsis.settings.value.cross": "크로스",
+  "stereopsis.settings.value.instant": "즉시",
+  "stereopsis.settings.value.disabled": "꺼짐"
+}
