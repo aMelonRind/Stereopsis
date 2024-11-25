@@ -11,6 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.JumpingMount;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.profiler.Profilers;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -65,7 +67,8 @@ public abstract class MixinInGameHud {
     private void moveCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (enabled && !rendering) {
             ci.cancel();
-            client.getProfiler().push("stereopsis-crosshair");
+            Profiler profiler = Profilers.get();
+            profiler.push("stereopsis-crosshair");
             rendering = true;
             offset = context.getScaledWindowWidth() * (0.25f + (Config.get().flipView ? xOffset : -xOffset));
 
@@ -76,7 +79,7 @@ public abstract class MixinInGameHud {
             renderCrosshair(context, tickCounter);
 
             rendering = false;
-            client.getProfiler().pop();
+            profiler.pop();
         }
     }
 
@@ -98,7 +101,7 @@ public abstract class MixinInGameHud {
         }
     }
 
-    @Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SrcFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DstFactor;)V"))
+    @Inject(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V", ordinal = 0))
     private void moveNormalCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (rendering) {
             float x = (righting ? -offset : offset);

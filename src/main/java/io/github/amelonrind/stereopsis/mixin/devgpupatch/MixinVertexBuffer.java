@@ -13,7 +13,7 @@ import static io.github.amelonrind.stereopsis.Stereopsis.devGpuPatch;
 @Mixin(value = VertexBuffer.class, priority = 69)
 public class MixinVertexBuffer {
 
-    @Inject(method = "drawInternal", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "draw(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lnet/minecraft/client/gl/ShaderProgram;)V", at = @At("HEAD"), cancellable = true)
     private void noop(Matrix4f viewMatrix, Matrix4f projectionMatrix, ShaderProgram program, CallbackInfo ci) {
         if (devGpuPatch) ci.cancel();
     }

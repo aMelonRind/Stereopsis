@@ -1,6 +1,6 @@
 #version 150
 
-uniform sampler2D DiffuseSampler;
+uniform sampler2D InSampler;
 uniform sampler2D LeftViewSampler;
 uniform sampler2D RightViewSampler;
 uniform float XOffset;

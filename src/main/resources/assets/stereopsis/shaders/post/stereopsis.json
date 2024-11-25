@@ -1,24 +1,20 @@
 {
-  "targets": [
-    "back",
-    "left",
-    "right"
+  "blend": {
+    "func": "add",
+    "srcrgb": "one",
+    "dstrgb": "zero"
+  },
+  "vertex": "minecraft:post/sobel",
+  "fragment": "stereopsis:post/stereopsis",
+  "samplers": [
+    { "name": "InSampler" },
+    { "name": "LeftViewSampler" },
+    { "name": "RightViewSampler" }
   ],
-  "passes": [
-    {
-      "name": "stereopsis",
-      "intarget": "back",
-      "outtarget": "minecraft:main",
-      "auxtargets": [
-        {
-          "name": "LeftViewSampler",
-          "id": "left"
-        },
-        {
-          "name": "RightViewSampler",
-          "id": "right"
-        }
-      ]
-    }
+  "uniforms": [
+    { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "InSize",  "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+    { "name": "OutSize", "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+    { "name": "XOffset", "type": "float",     "count": 1,  "values": [ 0.0 ] }
   ]
 }

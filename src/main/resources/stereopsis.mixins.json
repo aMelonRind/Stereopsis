@@ -8,17 +8,14 @@
   ],
   "client": [
     "MixinAccessCamera",
-    "MixinAccessEntityRenderer",
-    "MixinAccessHeldItemRenderer",
-    "MixinAccessPostEffectProcessor",
     "MixinChatHud",
     "MixinGameRenderer",
     "MixinHeldItemRenderer",
     "MixinInGameHud",
     "MixinMinecraftClient",
-    "MixinPostEffectProcessor",
     "MixinSpectatorHud",
     "MixinSubtitlesHud",
+    "MixinWorldRenderer",
     "devgpupatch.MixinGameRenderer",
     "devgpupatch.MixinVertexBuffer"
   ],

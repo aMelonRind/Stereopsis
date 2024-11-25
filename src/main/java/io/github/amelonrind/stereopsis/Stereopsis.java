@@ -11,6 +11,8 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.profiler.Profilers;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,7 +89,8 @@ public class Stereopsis implements ClientModInitializer {
     public static void moveHud(String name, DrawContext context, CallbackInfo ci, Runnable render) {
         if (enabled && !renderingHud) {
             ci.cancel();
-            mc.getProfiler().push("stereopsis-" + name);
+            Profiler profiler = Profilers.get();
+            profiler.push("stereopsis-" + name);
             renderingHud = true;
 
             offsetHudPush(context, false);
@@ -99,18 +102,19 @@ public class Stereopsis implements ClientModInitializer {
             context.getMatrices().pop();
 
             renderingHud = false;
-            mc.getProfiler().pop();
+            profiler.pop();
         }
     }
 
     public static void moveSideHud(String name, DrawContext context, boolean toRight, Runnable render) {
         if (enabled) {
-            mc.getProfiler().push("stereopsis-" + name);
+            Profiler profiler = Profilers.get();
+            profiler.push("stereopsis-" + name);
             context.getMatrices().push();
             context.getMatrices().translate((toRight ? 2 : -2) * Stereopsis.getHudOffset(), 0, 0);
             render.run();
             context.getMatrices().pop();
-            mc.getProfiler().pop();
+            profiler.pop();
         }
     }
 

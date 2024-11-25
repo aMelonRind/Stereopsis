@@ -1,0 +1,36 @@
+{
+  "targets": {
+    "dummy": {}
+  },
+  "passes": [
+    {
+      "program": "stereopsis:post/stereopsis",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "stereopsis:back"
+        },
+        {
+          "sampler_name": "LeftView",
+          "target": "stereopsis:left"
+        },
+        {
+          "sampler_name": "RightView",
+          "target": "stereopsis:right"
+        }
+      ],
+      "output": "minecraft:main"
+    },
+    {
+      "_comment": "due to vanilla post processors being complicate enough that the outputs already present in other passes' inputs, they forgot to add output target to externalTargets, so we need to have a dummy pass here. it took me around 12 hours to figure this out.",
+      "program": "minecraft:post/blit",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "minecraft:main"
+        }
+      ],
+      "output": "dummy"
+    }
+  ]
+}
