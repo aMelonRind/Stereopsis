@@ -1,5 +1,6 @@
 package io.github.amelonrind.stereopsis.mixin;
 
+import io.github.amelonrind.stereopsis.config.Config;
 import net.minecraft.client.gui.hud.ChatHud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,7 +36,7 @@ public abstract class MixinChatHud {
     @Inject(method = "getWidth()I", at = @At("RETURN"), cancellable = true)
     private void modifyWidth(CallbackInfoReturnable<Integer> cir) {
         int width = cir.getReturnValueI();
-        if (enabled && !isChatFocused()) {
+        if (enabled && !isChatFocused() && Config.get().splitHud) {
             int max = mc.getWindow().getScaledWidth() / 3;
             if (width > max) cir.setReturnValue(width = max);
         }

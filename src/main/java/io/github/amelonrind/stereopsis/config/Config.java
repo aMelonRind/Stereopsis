@@ -38,6 +38,9 @@ public class Config {
     @SerialEntry(comment = "The speed of the horizontal offset. negative for instant")
     public float offsetSpeed = 1.0f;
 
+    @SerialEntry(comment = "Splits some HUD to both sides")
+    public boolean splitHud = true;
+
     @SerialEntry(comment = "Decides if the HUD xOffset should be in inverse")
     public boolean inverseHudXOffsetDirection = false;
 

@@ -87,7 +87,7 @@ public class Stereopsis implements ClientModInitializer {
     }
 
     public static void moveHud(String name, DrawContext context, CallbackInfo ci, Runnable render) {
-        if (enabled && !renderingHud) {
+        if (enabled && !renderingHud && Config.get().splitHud) {
             ci.cancel();
             Profiler profiler = Profilers.get();
             profiler.push("stereopsis-" + name);
@@ -107,7 +107,7 @@ public class Stereopsis implements ClientModInitializer {
     }
 
     public static void moveSideHud(String name, DrawContext context, boolean toRight, Runnable render) {
-        if (enabled) {
+        if (enabled && Config.get().splitHud) {
             Profiler profiler = Profilers.get();
             profiler.push("stereopsis-" + name);
             context.getMatrices().push();

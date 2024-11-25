@@ -15,6 +15,8 @@
   "stereopsis.settings.maxXOffset.description": "The max offset for the view to focus on the crosshair.",
   "stereopsis.settings.offsetSpeed": "Horizontal Offset Speed",
   "stereopsis.settings.offsetSpeed.description": "",
+  "stereopsis.settings.splitHud": "Split HUD",
+  "stereopsis.settings.splitHud.description": "Splits some HUD to both sides",
   "stereopsis.settings.inverseHudXOffsetDirection": "Inverse HUD xOffset Direction",
   "stereopsis.settings.inverseHudXOffsetDirection.description": "Decides if xOffset (affected by crosshair target distance) should be in inverse on HUD.",
   "stereopsis.settings.hudOffset": "HUD Offset",

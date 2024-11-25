@@ -15,6 +15,8 @@
   "stereopsis.settings.maxXOffset.description": "讓視角聚焦在準星的最大位移",
   "stereopsis.settings.offsetSpeed": "橫向位移速度",
   "stereopsis.settings.offsetSpeed.description": "",
+  "stereopsis.settings.splitHud": "分割HUD",
+  "stereopsis.settings.splitHud.description": "把部分HUD分割到兩側",
   "stereopsis.settings.inverseHudXOffsetDirection": "反轉HUD的xOffset方向",
   "stereopsis.settings.inverseHudXOffsetDirection.description": "決定xOffset(被準星目標距離影響的數值)是否應該在HUD反轉",
   "stereopsis.settings.hudOffset": "HUD橫向位移",
