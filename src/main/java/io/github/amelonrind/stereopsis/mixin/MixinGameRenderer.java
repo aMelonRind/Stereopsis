@@ -1,6 +1,8 @@
 package io.github.amelonrind.stereopsis.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -57,8 +59,6 @@ public abstract class MixinGameRenderer {
     @Shadow @Nullable private Identifier postProcessorId;
     @Shadow @Final private Pool pool;
 
-    @Shadow public abstract void renderWorld(RenderTickCounter tickCounter);
-
     @Shadow protected abstract void renderFloatingItem(DrawContext context, float tickDelta);
 
     @Unique private static final double PI2 = Math.PI / 2;
@@ -75,60 +75,63 @@ public abstract class MixinGameRenderer {
         StereopsisFramebufferSet.clear();
     }
 
-    @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
-    private void renderStereopsis(RenderTickCounter tickCounter, CallbackInfo ci) {
-        Stereopsis.resetHudOffset();
-        if (enabled && !rendering) {
-            rendering = true;
-            ci.cancel();
-            Config cfg = Config.get();
-            boolean doMagic = cfg.magicFixForShaders;
-
-            StereopsisFramebufferSet.setFlip(cfg.flipView);
-
-            Profiler profiler = Profilers.get();
-            profiler.push("stereopsis-world");
-            crosshair = null;
-            leftCrosshair = null;
-            rightCrosshair = null;
-
-            profiler.push("blit");
-            back.clear();
-            blit(client.getFramebuffer(), back);
-
-            setupSide("left", doMagic ? cache : left, false);
-            renderWorld(tickCounter);
-            client.worldRenderer.drawEntityOutlinesFramebuffer();
-
-            setupSide("right", right, true);
-            renderWorld(tickCounter);
-            client.worldRenderer.drawEntityOutlinesFramebuffer();
-
-            Framebuffer outlines = client.worldRenderer.getEntityOutlinesFramebuffer();
-            if (outlines != null) outlines.clear();
-            Stereopsis.framebufferOverride = null;
-            profiler.swap("render");
-            if (doMagic) blit(cache, left); // this fixes shader glitches and idk why
-            RenderSystem.disableCull();
-            RenderSystem.disableBlend();
-            RenderSystem.disableDepthTest();
-            StereopsisFramebufferSet.render(pool);
-            RenderSystem.enableCull();
-
-            profiler.pop();
-            profiler.pop();
-            rendering = false;
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V"))
+    private void renderStereopsis(GameRenderer instance, RenderTickCounter renderTickCounter, Operation<Void> original) {
+        if (!enabled) {
+            original.call(instance, renderTickCounter);
+            return;
         }
+        Stereopsis.resetHudOffset();
+        Config cfg = Config.get();
+        boolean doMagic = cfg.magicFixForShaders;
+
+        StereopsisFramebufferSet.setFlip(cfg.flipView);
+
+        rendering = true;
+        Profiler profiler = Profilers.get();
+        profiler.push("stereopsis-world");
+        crosshair = null;
+        leftCrosshair = null;
+        rightCrosshair = null;
+
+        profiler.push("blit");
+        back.clear();
+        blit(client.getFramebuffer(), back);
+
+        renderSide("left", doMagic ? cache : left, false, () -> original.call(instance, renderTickCounter));
+        if (doMagic) { // this fixes iris shader glitches and idk why
+            blit(cache, left);
+            cache.clear();
+        }
+        renderSide("right", right, true, () -> original.call(instance, renderTickCounter));
+
+        Framebuffer outlines = client.worldRenderer.getEntityOutlinesFramebuffer();
+        if (outlines != null) outlines.clear();
+        profiler.swap("render");
+//        if (doMagic) blit(cache, left); // before 1.21.2
+        RenderSystem.disableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.disableDepthTest();
+        StereopsisFramebufferSet.render(pool);
+        RenderSystem.enableCull();
+
+        profiler.pop();
+        profiler.pop();
+        rendering = false;
     }
 
     @Unique
-    private void setupSide(String name, @NotNull Framebuffer frame, boolean right) {
+    private void renderSide(String name, @NotNull Framebuffer frame, boolean right, Runnable render) {
         Profilers.get().swap(name);
         frame.clear();
         blit(back, frame);
         Stereopsis.framebufferOverride = frame;
         frame.beginWrite(false);
         righting = right;
+        render.run();
+        client.worldRenderer.drawEntityOutlinesFramebuffer();
+        frame.endWrite();
+        Stereopsis.framebufferOverride = null;
     }
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/BlockView;Lnet/minecraft/entity/Entity;ZZF)V"))

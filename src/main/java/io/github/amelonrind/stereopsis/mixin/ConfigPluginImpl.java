@@ -10,11 +10,13 @@ import java.util.Set;
 
 public class ConfigPluginImpl implements IMixinConfigPlugin {
 
-    // too lazy to do stereopsis.mixin.properties or something
-    private static final boolean doDevGpuPatch = FabricLoader.getInstance().getConfigDir()
-            .resolve("enable_dev_gpu_patch").toFile().exists();
+    private static final boolean doDevGpuPatch;
 
     static {
+        FabricLoader loader = FabricLoader.getInstance();
+        doDevGpuPatch = loader.isModLoaded("iris")
+                // too lazy to do stereopsis.mixin.properties or something
+                && loader.getConfigDir().resolve("enable_dev_gpu_patch").toFile().exists();
         if (doDevGpuPatch) System.out.println("Enabled gpu patch on Stereopsis.");
     }
 
